@@ -29,3 +29,7 @@ venv/
 # Node (se usar servidor local)
 node_modules/
 npm-debug.log*
+
+# Credenciais locais (nunca commitar)
+js/config.js
+.env.local
