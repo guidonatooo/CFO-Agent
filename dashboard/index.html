@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFO Agent — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --dark: #08163A; --royal: #0E2F7A; --royal-mid: #1A4BBF; --royal-light: #2D63E0;
+  --royal-pale: #EBF0FC; --gold: #C9971C; --gold-light: #F0C040;
+  --white: #FFFFFF; --off: #F6F8FD; --g100: #EEF1F8; --g300: #C4CEDE;
+  --g500: #8494B2; --g700: #3C4E6E;
+  --green: #27C93F; --green-dim: #0F7B5A; --red: #FF5F57; --red-dim: #D63047;
+  --amber: #F0C040;
+  --sidebar: 220px;
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+html, body { height: 100%; font-family: var(--font-b); background: var(--dark); color: var(--white); overflow: hidden; }
+
+/* ── LAYOUT ── */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar); min-width: var(--sidebar);
+  background: rgba(14,47,122,0.35);
+  border-right: 1px solid rgba(255,255,255,0.07);
+  display: flex; flex-direction: column;
+  padding: 0; overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  text-decoration: none;
+}
+.sidebar-logo-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--royal-mid);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-logo-icon svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 2; }
+.sidebar-logo-text .brand { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: white; letter-spacing: 0.05em; display: block; line-height: 1; }
+.sidebar-logo-text .sub { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 0.15em; text-transform: uppercase; }
+
+.sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.nav-section-label { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 0.14em; text-transform: uppercase; padding: 12px 10px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px; border-radius: 8px; margin-bottom: 2px;
+  font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.55);
+  cursor: pointer; transition: all 0.15s; text-decoration: none;
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(45,99,224,0.22); color: white; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: var(--royal-light); border-radius: 0 2px 2px 0; }
+.nav-item svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 100px; }
+.nav-badge.red { background: rgba(255,95,87,0.2); color: #FF5F57; }
+.nav-badge.amber { background: rgba(240,192,64,0.2); color: var(--amber); }
+
+.sidebar-footer { padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.07); }
+.sidebar-user { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+.sidebar-user:hover { background: rgba(255,255,255,0.06); }
+.user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--royal-mid); display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+.user-name { font-size: 12px; font-weight: 600; color: white; }
+.user-role { font-size: 10px; color: rgba(255,255,255,0.4); }
+
+/* ── MAIN ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  height: 56px; min-height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  background: rgba(8,22,58,0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(12px);
+}
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.page-title { font-size: 15px; font-weight: 700; color: white; }
+.page-breadcrumb { font-size: 12px; color: var(--g500); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.month-select {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  color: white; font-family: var(--font-b); font-size: 13px; font-weight: 500;
+  padding: 6px 12px; border-radius: 8px; cursor: pointer; outline: none;
+}
+.month-select option { background: var(--royal); color: white; }
+.topbar-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.8); font-family: var(--font-b); font-size: 12px; font-weight: 500;
+  padding: 6px 14px; border-radius: 8px; cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.topbar-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+.topbar-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+.content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── KPI GRID ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 20px;
+  transition: border-color 0.2s;
+}
+.kpi-card:hover { border-color: rgba(45,99,224,0.3); }
+.kpi-label { font-size: 11px; font-weight: 600; color: var(--g500); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.kpi-value { font-family: var(--font-d); font-size: 28px; font-weight: 700; color: white; line-height: 1; margin-bottom: 8px; }
+.kpi-delta { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; }
+.kpi-delta.pos { color: var(--green); }
+.kpi-delta.neg { color: var(--red); }
+.kpi-delta.neu { color: var(--g500); }
+.kpi-delta svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.5; }
+
+/* ── CHART CARDS ── */
+.chart-row { display: grid; gap: 16px; margin-bottom: 24px; }
+.chart-row.cols-2 { grid-template-columns: 2fr 1fr; }
+.chart-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.chart-row.cols-1 { grid-template-columns: 1fr; }
+.chart-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 20px;
+}
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.chart-title { font-size: 14px; font-weight: 700; color: white; }
+.chart-sub { font-size: 11px; color: var(--g500); margin-top: 3px; }
+.chart-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--g500); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.chart-wrap { position: relative; }
+.chart-wrap canvas { max-height: 220px; }
+
+/* ── ALERTS ── */
+.alerts-list { display: flex; flex-direction: column; gap: 10px; }
+.alert-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 10px;
+  border: 1px solid;
+}
+.alert-item.critical { background: rgba(255,95,87,0.08); border-color: rgba(255,95,87,0.25); }
+.alert-item.warning  { background: rgba(240,192,64,0.08); border-color: rgba(240,192,64,0.25); }
+.alert-item.info     { background: rgba(45,99,224,0.08);  border-color: rgba(45,99,224,0.25); }
+.alert-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.alert-icon.critical { background: rgba(255,95,87,0.15); }
+.alert-icon.warning  { background: rgba(240,192,64,0.15); }
+.alert-icon.info     { background: rgba(45,99,224,0.15); }
+.alert-icon svg { width: 15px; height: 15px; fill: none; stroke-width: 2; }
+.alert-icon.critical svg { stroke: var(--red); }
+.alert-icon.warning svg  { stroke: var(--amber); }
+.alert-icon.info svg     { stroke: var(--royal-light); }
+.alert-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 3px; }
+.alert-desc  { font-size: 12px; color: var(--g500); line-height: 1.5; }
+.alert-time  { font-size: 10px; color: var(--g500); margin-top: 4px; }
+
+/* ── TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left; padding: 10px 14px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--g500); background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.data-table td {
+  padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.85);
+}
+.data-table tr:hover td { background: rgba(255,255,255,0.03); }
+.data-table tr:last-child td { border-bottom: none; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 100px; }
+.badge.pos { background: rgba(39,201,63,0.12); color: var(--green); }
+.badge.neg { background: rgba(255,95,87,0.12); color: var(--red); }
+.badge.neu { background: rgba(132,148,178,0.12); color: var(--g500); }
+.badge.blue { background: rgba(45,99,224,0.15); color: #7BA8FF; }
+
+/* ── FILTERS ── */
+.filters { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-select {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: white; font-family: var(--font-b); font-size: 12px;
+  padding: 7px 12px; border-radius: 8px; cursor: pointer; outline: none;
+}
+.filter-select option { background: var(--dark); }
+.filter-label { font-size: 12px; color: var(--g500); }
+
+/* ── CHAT ── */
+.chat-container { display: flex; flex-direction: column; height: calc(100vh - 160px); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 16px; }
+.msg { display: flex; gap: 12px; max-width: 720px; }
+.msg.user { flex-direction: row-reverse; margin-left: auto; }
+.msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.msg-avatar.ai  { background: var(--royal-mid); color: white; font-family: var(--font-d); font-size: 14px; }
+.msg-avatar.usr { background: rgba(240,192,64,0.2); color: var(--amber); }
+.msg-bubble {
+  padding: 12px 16px; border-radius: 12px; font-size: 13.5px; line-height: 1.65;
+  max-width: 100%;
+}
+.msg.ai .msg-bubble { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); border-bottom-left-radius: 4px; }
+.msg.user .msg-bubble { background: rgba(45,99,224,0.2); color: white; border-bottom-right-radius: 4px; }
+.msg-bubble strong { color: var(--gold-light); }
+.suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.suggest-btn {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7); font-family: var(--font-b); font-size: 12px;
+  padding: 7px 14px; border-radius: 100px; cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.suggest-btn:hover { background: rgba(45,99,224,0.2); border-color: rgba(45,99,224,0.4); color: white; }
+.chat-input-area {
+  display: flex; gap: 10px; align-items: flex-end;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 12px 16px;
+  margin-top: 12px;
+}
+.chat-input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--font-b); font-size: 14px; color: white;
+  resize: none; max-height: 120px; min-height: 24px; line-height: 1.5;
+}
+.chat-input::placeholder { color: var(--g500); }
+.chat-send {
+  width: 36px; height: 36px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--royal-light), var(--royal-mid));
+  color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: opacity 0.2s, transform 0.15s;
+}
+.chat-send:hover { opacity: 0.85; transform: scale(1.05); }
+.chat-send svg { width: 15px; height: 15px; fill: none; stroke: white; stroke-width: 2; }
+
+/* ── EXPORT SECTION ── */
+.export-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.export-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 24px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; text-align: center;
+}
+.export-card:hover { border-color: rgba(45,99,224,0.4); background: rgba(45,99,224,0.06); }
+.export-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--royal-pale); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.export-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--royal); stroke-width: 2; }
+.export-title { font-size: 15px; font-weight: 700; color: white; margin-bottom: 6px; }
+.export-desc  { font-size: 12px; color: var(--g500); line-height: 1.5; }
+.btn-export {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-top: 16px; padding: 9px 20px; border-radius: 8px; border: none;
+  font-family: var(--font-b); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+}
+.btn-export.primary { background: linear-gradient(135deg, var(--royal-light), var(--royal-mid)); color: white; }
+.btn-export.gold    { background: linear-gradient(135deg, var(--gold-light), var(--gold));     color: var(--dark); }
+.btn-export:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-export svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* ── PAGINATION ── */
+.pagination { display: flex; align-items: center; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.page-btn {
+  width: 32px; height: 32px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all 0.15s; font-family: var(--font-b);
+}
+.page-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+.page-btn.active { background: var(--royal-mid); border-color: var(--royal-mid); color: white; }
+.page-info { font-size: 12px; color: var(--g500); margin: 0 6px; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) {
+  .sidebar { width: 60px; min-width: 60px; }
+  .sidebar-logo-text, .nav-item span, .nav-badge, .sidebar-footer .user-name, .sidebar-footer .user-role, .nav-section-label { display: none; }
+  .sidebar-logo { justify-content: center; padding: 14px; }
+  .nav-item { justify-content: center; padding: 10px; }
+  .sidebar-user { justify-content: center; }
+  .chart-row.cols-2, .chart-row.cols-3 { grid-template-columns: 1fr; }
+  .export-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <a href="../landing-page/index.html" class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg viewBox="0 0 20 20"><polyline points="2,14 7,8 11,12 18,4"/><line x1="16" y1="4" x2="20" y2="4"/><line x1="20" y1="4" x2="20" y2="8"/></svg>
+    </div>
+    <div class="sidebar-logo-text">
+      <span class="brand">CFO Agent</span>
+      <span class="sub">Financial Intel</span>
+    </div>
+  </a>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a class="nav-item active" onclick="showView('visao-geral', this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Visão Geral</span>
+    </a>
+    <a class="nav-item" onclick="showView('evolucao', this)">
+      <svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      <span>Evolução Temporal</span>
+    </a>
+    <a class="nav-item" onclick="showView('custos', this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <span>Breakdown de Custos</span>
+    </a>
+    <a class="nav-item" onclick="showView('fluxo', this)">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <span>Fluxo de Caixa</span>
+    </a>
+    <a class="nav-item" onclick="showView('tabela-custos', this)">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Tabela de Custos</span>
+    </a>
+    <a class="nav-item" onclick="showView('transacoes', this)">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>Transações</span>
+    </a>
+    <div class="nav-section-label">Avançado</div>
+    <a class="nav-item" onclick="showView('tendencias', this)">
+      <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      <span>Tendências</span>
+    </a>
+    <a class="nav-item" onclick="showView('alertas', this)">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Alertas</span>
+      <span class="nav-badge red">3</span>
+    </a>
+    <a class="nav-item" onclick="showView('assistente', this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <span>Assistente IA</span>
+      <span class="nav-badge amber">IA</span>
+    </a>
+    <a class="nav-item" onclick="showView('relatorios', this)">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Relatórios</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">G</div>
+      <div>
+        <div class="user-name">Guilherme</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="page-title" id="pageTitle">Visão Geral</div>
+        <div class="page-breadcrumb">CFO Agent · Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <select class="month-select" id="monthSelect" onchange="updateMonth()">
+        <option value="Dez/25">Dez/25</option>
+        <option value="Jan/26">Jan/26</option>
+        <option value="Fev/26" selected>Fev/26</option>
+        <option value="Mar/26">Mar/26</option>
+        <option value="Abr/26">Abr/26</option>
+      </select>
+      <button class="topbar-btn" onclick="showView('relatorios', null)">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+      <a href="../login/index.html" class="topbar-btn">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════════════
+         VIEW 1: VISÃO GERAL
+    ═══════════════════════════════════════ -->
+    <div class="view active" id="view-visao-geral">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Faturamento Total</div>
+          <div class="kpi-value">R$ 357,5K</div>
+          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> -9,5% vs Jan/26</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Lucro Líquido</div>
+          <div class="kpi-value" style="color:var(--red)">R$ -8,6K</div>
+          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> -122,4% vs Jan/26</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Margem de Lucro</div>
+          <div class="kpi-value" style="color:var(--red)">-2,4%</div>
+          <div class="kpi-delta neg">Abaixo da meta (5%)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Saldo Consolidado</div>
+          <div class="kpi-value">R$ 85,1K</div>
+          <div class="kpi-delta neu">5 instituições</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total de Custos</div>
+          <div class="kpi-value">R$ 366,1K</div>
+          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> +5,2% vs Jan/26</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ticket Médio</div>
+          <div class="kpi-value">R$ 4,2K</div>
+          <div class="kpi-delta pos"><svg viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15"/></svg> +3,1% vs Jan/26</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Entradas (Fev/26)</div>
+          <div class="kpi-value" style="color:var(--green)">R$ 394K</div>
+          <div class="kpi-delta pos"><svg viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15"/></svg> +8,3% vs Jan</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Saídas (Fev/26)</div>
+          <div class="kpi-value" style="color:var(--red)">R$ 402,6K</div>
+          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> +12,1% vs Jan</div>
+        </div>
+      </div>
+      <div class="chart-row cols-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Evolução Financeira — Dez/25 a Mar/26</div>
+              <div class="chart-sub">Faturamento · Custos · Lucro Líquido</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#2D63E0"></div>Faturamento</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FF5F57"></div>Custos</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#27C93F"></div>Lucro</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartEvolucaoGeral"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Saldo por Banco</div>
+              <div class="chart-sub">Fevereiro 2026</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartBancos"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-row cols-1">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Alertas Ativos</div>
+          </div>
+          <div class="alerts-list">
+            <div class="alert-item critical">
+              <div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div><div class="alert-title">Margem negativa em Fev/26</div><div class="alert-desc">Lucro líquido de -R$ 8.600 representa margem de -2,4%. Custos superaram o faturamento pelo 2º mês consecutivo.</div><div class="alert-time">Gerado em 01/03/2026</div></div>
+            </div>
+            <div class="alert-item warning">
+              <div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+              <div><div class="alert-title">Custo de Insumos acima da meta</div><div class="alert-desc">R$ 41.000 em Fev/26 vs meta de R$ 35.000. Variação de +17,1%. Verificar renegociação com fornecedores.</div><div class="alert-time">Gerado em 01/03/2026</div></div>
+            </div>
+            <div class="alert-item info">
+              <div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+              <div><div class="alert-title">Tendência de queda no faturamento</div><div class="alert-desc">Fev/26 apresentou queda de 9,5% vs Jan/26. Acompanhar março para confirmar tendência.</div><div class="alert-time">Gerado em 28/02/2026</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 2: EVOLUÇÃO TEMPORAL
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-evolucao">
+      <div class="chart-row cols-1">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Faturamento vs Custos vs Lucro — Dez/25 a Mar/26</div><div class="chart-sub">Comparativo mensal com barras agrupadas</div></div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#2D63E0"></div>Faturamento</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FF5F57"></div>Custos</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#27C93F"></div>Lucro Líquido</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartEvolucaoBar" style="max-height:300px"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-row cols-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Evolução do Saldo por Banco</div><div class="chart-sub">Área empilhada — Dez/25 a Mar/26</div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartSaldoBanco"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Margem de Lucro (%)</div><div class="chart-sub">Evolução mensal da margem</div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartMargem"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 3: BREAKDOWN DE CUSTOS
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-custos">
+      <div class="chart-row cols-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Top 10 Categorias de Custo</div><div class="chart-sub">Fevereiro 2026 — R$ 366,1K total</div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartCustoDonut" style="max-height:280px"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Custo por Categoria — Jan vs Fev</div><div class="chart-sub">Variação mensal</div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartCustoBar" style="max-height:280px"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div class="chart-title">Detalhamento de Custos — Fevereiro 2026</div></div>
+        <table class="data-table">
+          <thead><tr><th>Categoria</th><th>Fev/26 (R$)</th><th>Jan/26 (R$)</th><th>Variação</th><th>% do Total</th></tr></thead>
+          <tbody id="tbCustos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 4: FLUXO DE CAIXA
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-fluxo">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Entradas</div>
+          <div class="kpi-value" style="color:var(--green)">R$ 394,0K</div>
+          <div class="kpi-delta pos">Fevereiro 2026</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Saídas</div>
+          <div class="kpi-value" style="color:var(--red)">R$ 402,6K</div>
+          <div class="kpi-delta neg">Fevereiro 2026</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Saldo do Período</div>
+          <div class="kpi-value" style="color:var(--red)">R$ -8,6K</div>
+          <div class="kpi-delta neg">Consumo de caixa</div>
+        </div>
+      </div>
+      <div class="chart-row cols-2">
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Entradas vs Saídas — Mensal</div><div class="chart-sub">Dez/25 a Mar/26</div></div></div>
+          <div class="chart-wrap"><canvas id="chartFluxo"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Distribuição por Instituição</div><div class="chart-sub">Saídas em Fev/26</div></div></div>
+          <div class="chart-wrap"><canvas id="chartBancosPie"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div class="chart-title">Entradas e Saídas por Banco — Fev/26</div></div>
+        <table class="data-table">
+          <thead><tr><th>Instituição</th><th>Entradas (R$)</th><th>Saídas (R$)</th><th>Saldo (R$)</th><th>% das Saídas</th></tr></thead>
+          <tbody>
+            <tr><td>Unicred Geral</td><td style="color:var(--green)">R$ 0</td><td style="color:var(--red)">R$ 248.300</td><td style="color:var(--red)">-R$ 248.300</td><td><span class="badge neg">61,7%</span></td></tr>
+            <tr><td>Asaas</td><td style="color:var(--green)">R$ 319.500</td><td style="color:var(--red)">R$ 13.000</td><td style="color:var(--green)">+R$ 306.500</td><td><span class="badge pos">3,2%</span></td></tr>
+            <tr><td>Infinity Pay</td><td style="color:var(--green)">R$ 38.000</td><td style="color:var(--red)">R$ 69.000</td><td style="color:var(--red)">-R$ 31.000</td><td><span class="badge neg">17,1%</span></td></tr>
+            <tr><td>Finpet</td><td style="color:var(--green)">R$ 36.500</td><td style="color:var(--red)">R$ 41.000</td><td style="color:var(--red)">-R$ 4.500</td><td><span class="badge neg">10,2%</span></td></tr>
+            <tr><td>Dinheiro em Espécie</td><td style="color:var(--green)">R$ 0</td><td style="color:var(--red)">R$ 2.800</td><td style="color:var(--red)">-R$ 2.800</td><td><span class="badge neg">0,7%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 5: TABELA DE CUSTOS
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-tabela-custos">
+      <div class="filters">
+        <span class="filter-label">Período:</span>
+        <select class="filter-select"><option>Fev/26</option><option>Jan/26</option><option>Dez/25</option></select>
+        <span class="filter-label">Categoria:</span>
+        <select class="filter-select"><option>Todas</option><option>Equipe Técnica</option><option>Insumos</option><option>Marketing</option></select>
+      </div>
+      <div class="chart-card">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Categoria</th><th>Valor Fev/26</th><th>Valor Jan/26</th><th>Variação R$</th><th>Variação %</th><th>% do Total</th></tr></thead>
+          <tbody id="tbCustosDetalhado"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 6: TRANSAÇÕES
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-transacoes">
+      <div class="filters">
+        <span class="filter-label">Mês:</span>
+        <select class="filter-select" id="filterMes" onchange="filterTransacoes()">
+          <option value="">Todos</option>
+          <option value="Jan" selected>Jan/26</option>
+          <option value="Fev">Fev/26</option>
+        </select>
+        <span class="filter-label">Banco:</span>
+        <select class="filter-select" id="filterBanco" onchange="filterTransacoes()">
+          <option value="">Todos</option>
+          <option>Unicred Geral</option>
+          <option>Asaas</option>
+          <option>Infinity Pay</option>
+          <option>Finpet</option>
+          <option>Dinheiro em Espécie</option>
+        </select>
+        <span class="filter-label">Tipo:</span>
+        <select class="filter-select" id="filterTipo" onchange="filterTransacoes()">
+          <option value="">Todos</option>
+          <option>Entrada</option>
+          <option>Saída</option>
+        </select>
+      </div>
+      <div class="chart-card">
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Banco</th><th>Valor</th></tr></thead>
+          <tbody id="tbTransacoes"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 7: TENDÊNCIAS
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-tendencias">
+      <div class="chart-row cols-1">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Faturamento — Histórico + Projeção 3 Meses</div><div class="chart-sub">Média móvel 3M + tendência linear</div></div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#2D63E0"></div>Realizado</div>
+              <div class="legend-item"><div class="legend-dot" style="background:rgba(240,192,64,0.7)"></div>Projeção</div>
+              <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.3);border:1px dashed rgba(255,255,255,0.4)"></div>Média Móvel 3M</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartTendencias" style="max-height:300px"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-row cols-2">
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Projeção de Lucro</div><div class="chart-sub">Cenários otimista, base e pessimista</div></div></div>
+          <div class="chart-wrap"><canvas id="chartProjecaoLucro"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Resumo de Tendências</div></div></div>
+          <div class="alerts-list">
+            <div class="alert-item warning">
+              <div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+              <div><div class="alert-title">Faturamento em queda (-9,5%/mês)</div><div class="alert-desc">Projeção Mar/26: R$ 323K se tendência se mantiver. Ação necessária para reverter ciclo.</div></div>
+            </div>
+            <div class="alert-item info">
+              <div class="alert-icon info"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></div>
+              <div><div class="alert-title">Ponto de equilíbrio em R$ 366K</div><div class="alert-desc">Para zero margem, faturamento precisa superar R$ 366K. Meta para Mar/26: R$ 390K (+9%).</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 8: ALERTAS
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-alertas">
+      <div style="margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(255,95,87,0.12);border:1px solid rgba(255,95,87,0.25);">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div>
+          <span style="font-size:13px;font-weight:600;color:var(--red)">3 Críticos</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(240,192,64,0.12);border:1px solid rgba(240,192,64,0.25);">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div>
+          <span style="font-size:13px;font-weight:600;color:var(--amber)">4 Avisos</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(45,99,224,0.12);border:1px solid rgba(45,99,224,0.25);">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--royal-light)"></div>
+          <span style="font-size:13px;font-weight:600;color:#7BA8FF">3 Informativos</span>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div class="chart-title">Alertas Críticos</div></div>
+        <div class="alerts-list" style="margin-bottom:0">
+          <div class="alert-item critical"><div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="alert-title">Margem negativa — 2º mês consecutivo</div><div class="alert-desc">Fev/26: -2,4% · Jan/26: +1,0%. Tendência de deterioração acelerada. Revisar estrutura de custos urgente.</div><div class="alert-time">01/03/2026</div></div></div>
+          <div class="alert-item critical"><div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="alert-title">Folha de pagamento representa 24% do faturamento</div><div class="alert-desc">R$ 88.000 em Fev/26 vs R$ 357.500 faturados. Limite sugerido: 20%. Avaliar redimensionamento da equipe.</div><div class="alert-time">01/03/2026</div></div></div>
+          <div class="alert-item critical"><div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="alert-title">Saídas superam entradas em R$ 8.600</div><div class="alert-desc">Saldo do mês negativo pela primeira vez em 6 meses. Caixa disponível: R$ 85.100 (risco de liquidez em ~10 meses).</div><div class="alert-time">28/02/2026</div></div></div>
+        </div>
+      </div>
+      <div class="chart-card" style="margin-top:16px">
+        <div class="chart-header"><div class="chart-title">Avisos</div></div>
+        <div class="alerts-list" style="margin-bottom:0">
+          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Insumos acima da meta (+17,1%)</div><div class="alert-desc">R$ 41.000 vs meta R$ 35.000. Renegociar contratos com fornecedores até Abr/26.</div><div class="alert-time">01/03/2026</div></div></div>
+          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Faturamento caindo 3 meses seguidos</div><div class="alert-desc">Dez/25: R$ 422K → Jan/26: R$ 395K → Fev/26: R$ 357K. Queda acumulada de -15,4%.</div><div class="alert-time">28/02/2026</div></div></div>
+          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Investimentos pausados em Fev/26</div><div class="alert-desc">R$ 0 investido em Fev/26 vs R$ 8.000 em Jan/26. Avaliar impacto na capacidade produtiva.</div><div class="alert-time">01/03/2026</div></div></div>
+          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Marketing: ROI não mensurado</div><div class="alert-desc">R$ 14.500 gastos em mídia paga em Fev/26. Sem rastreamento de conversões ativo.</div><div class="alert-time">28/02/2026</div></div></div>
+        </div>
+      </div>
+      <div class="chart-card" style="margin-top:16px">
+        <div class="chart-header"><div class="chart-title">Informativos</div></div>
+        <div class="alerts-list" style="margin-bottom:0">
+          <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Saldo Finpet caiu 33%</div><div class="alert-desc">De R$ 18.000 (Jan) para R$ 12.000 (Fev). Verificar movimentações pendentes.</div><div class="alert-time">28/02/2026</div></div></div>
+          <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Ticket médio cresceu +3,1%</div><div class="alert-desc">R$ 4.200 em Fev/26 vs R$ 4.074 em Jan/26. Tendência positiva mesmo com queda no volume.</div><div class="alert-time">01/03/2026</div></div></div>
+          <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Parcela de financiamento quitada em Mar/26</div><div class="alert-desc">Última parcela do contrato em Mar/26. Libera R$ 18.000/mês a partir de Abr/26.</div><div class="alert-time">28/02/2026</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 9: ASSISTENTE IA
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-assistente">
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg ai">
+            <div class="msg-avatar ai">C</div>
+            <div>
+              <div class="msg-bubble">
+                Olá! Sou o <strong>CFO Agent</strong>, seu assistente de inteligência financeira. Tenho acesso aos dados do seu dashboard — faturamento, custos, margens, saldos e muito mais.<br><br>
+                O que você gostaria de analisar hoje?
+              </div>
+              <div class="suggestions">
+                <button class="suggest-btn" onclick="sendSuggestion(this)">Qual mês teve maior margem?</button>
+                <button class="suggest-btn" onclick="sendSuggestion(this)">Quais são meus maiores custos?</button>
+                <button class="suggest-btn" onclick="sendSuggestion(this)">Quando vou atingir breakeven?</button>
+                <button class="suggest-btn" onclick="sendSuggestion(this)">Como está meu fluxo de caixa?</button>
+                <button class="suggest-btn" onclick="sendSuggestion(this)">Analise o mês de Fev/26</button>
+                <button class="suggest-btn" onclick="sendSuggestion(this)">Quais ações tomar agora?</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" placeholder="Pergunte sobre seus dados financeiros..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="autoResize(this)"></textarea>
+          <button class="chat-send" onclick="sendChat()">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         VIEW 10: RELATÓRIOS
+    ═══════════════════════════════════════ -->
+    <div class="view" id="view-relatorios">
+      <div class="export-grid">
+        <div class="export-card">
+          <div class="export-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="export-title">Resumo Executivo</div>
+          <div class="export-desc">KPIs principais, comparativo mensal e análise de tendências. Ideal para reunião de diretoria.</div>
+          <button class="btn-export primary" onclick="printReport('resumo')">
+            <svg viewBox="0 0 24 24"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Imprimir PDF
+          </button>
+        </div>
+        <div class="export-card">
+          <div class="export-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+          <div class="export-title">Evolução Mensal</div>
+          <div class="export-desc">Gráficos de faturamento, custos e lucro mês a mês com análise de variação.</div>
+          <button class="btn-export primary" onclick="printReport('evolucao')">
+            <svg viewBox="0 0 24 24"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Imprimir PDF
+          </button>
+        </div>
+        <div class="export-card">
+          <div class="export-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+          <div class="export-title">Breakdown de Custos</div>
+          <div class="export-desc">Análise detalhada por categoria, variações e participação percentual no total.</div>
+          <button class="btn-export primary" onclick="printReport('custos')">
+            <svg viewBox="0 0 24 24"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Imprimir PDF
+          </button>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Exportar Dados</div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button class="btn-export gold" onclick="exportCSV()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar Transações CSV
+          </button>
+          <button class="btn-export primary" onclick="exportCSV('custos')">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar Custos CSV
+          </button>
+          <button class="btn-export primary" onclick="exportCSV('faturamento')">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar Faturamento CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const MONTHS = ['Dez/25','Jan/26','Fev/26','Mar/26'];
+const FAT    = [422000, 395000, 357500, null];
+const CUSTOS_TOT = [384000, 391000, 366100, null];
+const LUCRO  = [38000, 3960, -8600, null];
+const MARGEM = [9.0, 1.0, -2.4, null];
+
+const BANCOS = {
+  labels: ['Unicred', 'Infinity Pay', 'Asaas', 'Finpet', 'Dinheiro'],
+  colors: ['#2D63E0','#1A9E75','#F0C040','#9B5CF6','#8494B2'],
+  jan: [45000, 12000, 8500, 18000, 1600],
+  fev: [48000, 15000, 9200, 12000,  900],
+};
+
+const CUSTOS_CATS = [
+  {cat:'Salários + VT + VR + VA', jan:85000, fev:88000},
+  {cat:'Insumos',                  jan:38000, fev:41000},
+  {cat:'Equipe Técnica',           jan:45000, fev:47000},
+  {cat:'Imposto sobre Vendas',     jan:28000, fev:25500},
+  {cat:'Despesa Empréstimo/Financ.',jan:18000,fev:18000},
+  {cat:'Impostos/Desp. Salários',  jan:21000, fev:22000},
+  {cat:'Profissionais Externos',   jan:15000, fev:16500},
+  {cat:'Laboratórios Externos',    jan:11000, fev:9500},
+  {cat:'Marketing',                jan:9500,  fev:9500},
+  {cat:'Despesas com Diretoria',   jan:22000, fev:22000},
+  {cat:'Despesas com Imóvel',      jan:12000, fev:12000},
+  {cat:'Investimento',             jan:8000,  fev:0},
+  {cat:'Desp. Administrativas',    jan:7500,  fev:7500},
+  {cat:'Despesa TI + Telecom',     jan:6500,  fev:6500},
+  {cat:'Despesas Financeiras',     jan:5500,  fev:5800},
+  {cat:'Despesa Veículos',         jan:4500,  fev:4200},
+  {cat:'Outros Custos',            jan:3000,  fev:2800},
+];
+
+const TRANSACOES = [
+  {data:'03/01/2026',desc:'Recebimento Cliente A',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:95000},
+  {data:'05/01/2026',desc:'Pagamento Folha Jan',cat:'Salários',tipo:'Saída',banco:'Unicred Geral',valor:85000},
+  {data:'07/01/2026',desc:'Compra Insumos Lote 1',cat:'Insumos',tipo:'Saída',banco:'Unicred Geral',valor:18500},
+  {data:'08/01/2026',desc:'Recebimento Cliente B',cat:'Faturamento',tipo:'Entrada',banco:'Infinity Pay',valor:42000},
+  {data:'10/01/2026',desc:'Aluguel Imóvel Jan',cat:'Imóvel',tipo:'Saída',banco:'Unicred Geral',valor:12000},
+  {data:'12/01/2026',desc:'Parcela Financiamento',cat:'Financiamento',tipo:'Saída',banco:'Unicred Geral',valor:18000},
+  {data:'14/01/2026',desc:'Serviços Contabilidade',cat:'Prof. Externos',tipo:'Saída',banco:'Asaas',valor:4500},
+  {data:'15/01/2026',desc:'DARF Simples Nacional',cat:'Impostos',tipo:'Saída',banco:'Unicred Geral',valor:28000},
+  {data:'16/01/2026',desc:'Recebimento Cliente C',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:58000},
+  {data:'18/01/2026',desc:'Google Ads Jan',cat:'Marketing',tipo:'Saída',banco:'Infinity Pay',valor:4500},
+  {data:'20/01/2026',desc:'Tarifa Bancária',cat:'Desp. Financeiras',tipo:'Saída',banco:'Unicred Geral',valor:1200},
+  {data:'22/01/2026',desc:'Compra Insumos Lote 2',cat:'Insumos',tipo:'Saída',banco:'Finpet',valor:19500},
+  {data:'24/01/2026',desc:'Recebimento Cliente D',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:75000},
+  {data:'25/01/2026',desc:'FGTS Jan',cat:'Impostos/Salários',tipo:'Saída',banco:'Unicred Geral',valor:8500},
+  {data:'28/01/2026',desc:'Licença Software ERP',cat:'TI + Telecom',tipo:'Saída',banco:'Infinity Pay',valor:3200},
+  {data:'29/01/2026',desc:'Combustível Veículos Jan',cat:'Veículos',tipo:'Saída',banco:'Dinheiro em Espécie',valor:2800},
+  {data:'30/01/2026',desc:'Recebimento Cliente E',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:125000},
+  {data:'03/02/2026',desc:'Recebimento Cliente A Fev',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:92000},
+  {data:'05/02/2026',desc:'Pagamento Folha Fev',cat:'Salários',tipo:'Saída',banco:'Unicred Geral',valor:88000},
+  {data:'07/02/2026',desc:'Laboratório Externo',cat:'Laboratórios',tipo:'Saída',banco:'Unicred Geral',valor:9500},
+  {data:'09/02/2026',desc:'Recebimento Cliente B Fev',cat:'Faturamento',tipo:'Entrada',banco:'Infinity Pay',valor:38000},
+  {data:'10/02/2026',desc:'Aluguel Imóvel Fev',cat:'Imóvel',tipo:'Saída',banco:'Unicred Geral',valor:12000},
+  {data:'12/02/2026',desc:'Parcela Financiamento Fev',cat:'Financiamento',tipo:'Saída',banco:'Unicred Geral',valor:18000},
+  {data:'14/02/2026',desc:'Instagram Ads Fev',cat:'Marketing',tipo:'Saída',banco:'Infinity Pay',valor:5000},
+  {data:'15/02/2026',desc:'DARF Simples Nacional Fev',cat:'Impostos',tipo:'Saída',banco:'Unicred Geral',valor:25500},
+  {data:'18/02/2026',desc:'Recebimento Cliente F',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:44000},
+  {data:'20/02/2026',desc:'Equipe Técnica Fev',cat:'Equipe Técnica',tipo:'Saída',banco:'Unicred Geral',valor:47000},
+  {data:'22/02/2026',desc:'Compra Insumos Fev',cat:'Insumos',tipo:'Saída',banco:'Finpet',valor:41000},
+  {data:'25/02/2026',desc:'FGTS Fev',cat:'Impostos/Salários',tipo:'Saída',banco:'Unicred Geral',valor:8800},
+  {data:'28/02/2026',desc:'Recebimento Cliente G',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:83500},
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────
+const fmt = v => v == null ? '—' : 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtPct = v => v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+const chartDefaults = () => ({
+  plugins: { legend: { display: false }, tooltip: {
+    backgroundColor: 'rgba(8,22,58,0.95)', titleColor: '#fff', bodyColor: 'rgba(255,255,255,0.7)',
+    borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 10,
+    callbacks: { label: ctx => ' ' + fmt(ctx.raw) }
+  }},
+  scales: {
+    x: { grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, ticks: { color: '#8494B2', font: {size:11} } },
+    y: { grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, ticks: { color: '#8494B2', font: {size:11}, callback: v => 'R$' + (v/1000).toFixed(0)+'K' } }
+  },
+  responsive: true, maintainAspectRatio: true,
+});
+
+// ── CHARTS ───────────────────────────────────────────────────────
+function initCharts() {
+  Chart.defaults.color = '#8494B2';
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+  // Visão Geral — Evolução
+  new Chart(document.getElementById('chartEvolucaoGeral'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS.slice(0,3),
+      datasets: [
+        {label:'Faturamento', data:FAT.slice(0,3), backgroundColor:'rgba(45,99,224,0.7)', borderRadius:4},
+        {label:'Custos',      data:CUSTOS_TOT.slice(0,3), backgroundColor:'rgba(255,95,87,0.6)', borderRadius:4},
+        {label:'Lucro',       data:LUCRO.slice(0,3), type:'line', borderColor:'#27C93F', pointBackgroundColor:'#27C93F', tension:0.4, fill:false, borderWidth:2, pointRadius:4},
+      ]
+    },
+    options: { ...chartDefaults(), plugins: { ...chartDefaults().plugins, legend: { display: true, labels: { color: '#8494B2', boxWidth: 10, font:{size:11} } } } }
+  });
+
+  // Visão Geral — Bancos donut
+  new Chart(document.getElementById('chartBancos'), {
+    type: 'doughnut',
+    data: {
+      labels: BANCOS.labels,
+      datasets: [{ data: BANCOS.fev, backgroundColor: BANCOS.colors, borderWidth: 0, hoverOffset: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true, cutout: '70%',
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { color: '#8494B2', boxWidth: 10, font:{size:11}, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + fmt(ctx.raw) } }
+      }
+    }
+  });
+
+  // Evolução — barras
+  new Chart(document.getElementById('chartEvolucaoBar'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS.slice(0,3),
+      datasets: [
+        {label:'Faturamento', data:FAT.slice(0,3), backgroundColor:'rgba(45,99,224,0.75)', borderRadius:5},
+        {label:'Custos',      data:CUSTOS_TOT.slice(0,3), backgroundColor:'rgba(255,95,87,0.65)', borderRadius:5},
+        {label:'Lucro',       data:LUCRO.slice(0,3), type:'line', borderColor:'#27C93F', pointBackgroundColor:'#27C93F', tension:0.4, fill:false, borderWidth:2.5, pointRadius:5},
+      ]
+    },
+    options: {
+      ...chartDefaults(),
+      plugins: { ...chartDefaults().plugins, legend: { display: true, labels: { color:'#8494B2', boxWidth:10, font:{size:11} } } }
+    }
+  });
+
+  // Evolução — saldo por banco área
+  new Chart(document.getElementById('chartSaldoBanco'), {
+    type: 'line',
+    data: {
+      labels: ['Jan/26','Fev/26'],
+      datasets: BANCOS.labels.map((l,i) => ({
+        label: l, data: [BANCOS.jan[i], BANCOS.fev[i]],
+        borderColor: BANCOS.colors[i], backgroundColor: BANCOS.colors[i]+'33',
+        fill: true, tension: 0.4, borderWidth: 2, pointRadius: 4,
+      }))
+    },
+    options: {
+      ...chartDefaults(),
+      plugins: { ...chartDefaults().plugins, legend: { display: true, labels: { color:'#8494B2', boxWidth:10, font:{size:11} } } }
+    }
+  });
+
+  // Margem
+  new Chart(document.getElementById('chartMargem'), {
+    type: 'line',
+    data: {
+      labels: MONTHS.slice(0,3),
+      datasets: [{
+        data: MARGEM.slice(0,3), borderColor: '#F0C040', backgroundColor: 'rgba(240,192,64,0.08)',
+        fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 5, pointBackgroundColor: '#F0C040',
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw.toFixed(1)+'%' } } },
+      scales: {
+        x: { grid: { color:'rgba(255,255,255,0.05)', drawBorder:false }, ticks:{color:'#8494B2',font:{size:11}} },
+        y: { grid: { color:'rgba(255,255,255,0.05)', drawBorder:false }, ticks:{color:'#8494B2',font:{size:11},callback:v=>v+'%'} }
+      }
+    }
+  });
+
+  // Custos — donut top 10
+  const top10 = CUSTOS_CATS.slice(0,10);
+  const COLORS10 = ['#2D63E0','#FF5F57','#27C93F','#F0C040','#9B5CF6','#1A9E75','#F97316','#06B6D4','#EC4899','#8494B2'];
+  new Chart(document.getElementById('chartCustoDonut'), {
+    type: 'doughnut',
+    data: {
+      labels: top10.map(c => c.cat.length > 22 ? c.cat.slice(0,22)+'…' : c.cat),
+      datasets: [{ data: top10.map(c=>c.fev), backgroundColor: COLORS10, borderWidth:0, hoverOffset:6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true, cutout: '62%',
+      plugins: {
+        legend: { display: true, position:'right', labels:{color:'#8494B2',boxWidth:10,font:{size:10},padding:8} },
+        tooltip: { callbacks: { label: ctx => ctx.label+': '+fmt(ctx.raw) } }
+      }
+    }
+  });
+
+  // Custos — barras jan vs fev
+  new Chart(document.getElementById('chartCustoBar'), {
+    type: 'bar',
+    data: {
+      labels: CUSTOS_CATS.slice(0,8).map(c=>c.cat.split(' ')[0]),
+      datasets: [
+        {label:'Jan/26', data:CUSTOS_CATS.slice(0,8).map(c=>c.jan), backgroundColor:'rgba(45,99,224,0.6)', borderRadius:3},
+        {label:'Fev/26', data:CUSTOS_CATS.slice(0,8).map(c=>c.fev), backgroundColor:'rgba(255,95,87,0.6)', borderRadius:3},
+      ]
+    },
+    options: {
+      ...chartDefaults(),
+      indexAxis: 'y',
+      scales: {
+        x: { grid:{color:'rgba(255,255,255,0.05)',drawBorder:false}, ticks:{color:'#8494B2',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'K'} },
+        y: { grid:{display:false}, ticks:{color:'#8494B2',font:{size:10}} },
+      },
+      plugins: { ...chartDefaults().plugins, legend:{display:true,labels:{color:'#8494B2',boxWidth:10,font:{size:11}}} }
+    }
+  });
+
+  // Fluxo — barras
+  new Chart(document.getElementById('chartFluxo'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS.slice(0,3),
+      datasets: [
+        {label:'Entradas', data:[395000, 394000, 357500], backgroundColor:'rgba(39,201,63,0.65)', borderRadius:4},
+        {label:'Saídas',   data:[384000, 391000, 366100], backgroundColor:'rgba(255,95,87,0.65)', borderRadius:4},
+      ]
+    },
+    options: {
+      ...chartDefaults(),
+      plugins: { ...chartDefaults().plugins, legend:{display:true,labels:{color:'#8494B2',boxWidth:10,font:{size:11}}} }
+    }
+  });
+
+  // Bancos pie
+  new Chart(document.getElementById('chartBancosPie'), {
+    type: 'pie',
+    data: {
+      labels: ['Unicred Geral','Asaas','Infinity Pay','Finpet','Dinheiro'],
+      datasets: [{data:[248300,13000,69000,41000,2800], backgroundColor:BANCOS.colors, borderWidth:0}]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins: {
+        legend:{display:true,position:'bottom',labels:{color:'#8494B2',boxWidth:10,font:{size:11},padding:10}},
+        tooltip:{callbacks:{label:ctx=>ctx.label+': '+fmt(ctx.raw)}}
+      }
+    }
+  });
+
+  // Tendências
+  const projFat = [395000, 357500, 323000, 291000, 262000];
+  const projMM  = [null, null, 391833, 358500, 323833];
+  new Chart(document.getElementById('chartTendencias'), {
+    type: 'line',
+    data: {
+      labels: ['Dez/25','Jan/26','Fev/26','Mar/26(proj)','Abr/26(proj)'],
+      datasets: [
+        {label:'Realizado', data:[422000,395000,357500,null,null], borderColor:'#2D63E0', backgroundColor:'rgba(45,99,224,0.08)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#2D63E0'},
+        {label:'Projeção',  data:[null,null,357500,323000,291000], borderColor:'rgba(240,192,64,0.8)', backgroundColor:'rgba(240,192,64,0.05)', fill:false, tension:0.4, borderWidth:2, borderDash:[6,4], pointRadius:4, pointBackgroundColor:'rgba(240,192,64,0.8)'},
+        {label:'Média Móvel 3M', data:projMM, borderColor:'rgba(255,255,255,0.25)', fill:false, tension:0.4, borderWidth:1.5, borderDash:[3,3], pointRadius:2},
+      ]
+    },
+    options: {
+      ...chartDefaults(),
+      plugins: { ...chartDefaults().plugins, legend:{display:true,labels:{color:'#8494B2',boxWidth:10,font:{size:11}}} }
+    }
+  });
+
+  // Projeção lucro
+  new Chart(document.getElementById('chartProjecaoLucro'), {
+    type: 'line',
+    data: {
+      labels: ['Fev/26','Mar/26','Abr/26','Mai/26'],
+      datasets: [
+        {label:'Otimista', data:[-8600,5000,22000,38000], borderColor:'#27C93F', fill:false, tension:0.4, borderWidth:2, pointRadius:4, borderDash:[5,3]},
+        {label:'Base',     data:[-8600,-12000,-5000,8000], borderColor:'#F0C040', fill:false, tension:0.4, borderWidth:2, pointRadius:4},
+        {label:'Pessimista',data:[-8600,-18000,-25000,-30000], borderColor:'#FF5F57', fill:false, tension:0.4, borderWidth:2, pointRadius:4, borderDash:[5,3]},
+      ]
+    },
+    options: {
+      ...chartDefaults(),
+      scales: {
+        x:{grid:{color:'rgba(255,255,255,0.05)',drawBorder:false},ticks:{color:'#8494B2',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.05)',drawBorder:false},ticks:{color:'#8494B2',font:{size:11},callback:v=>'R$'+(v/1000).toFixed(0)+'K'}}
+      },
+      plugins:{...chartDefaults().plugins,legend:{display:true,labels:{color:'#8494B2',boxWidth:10,font:{size:11}}}}
+    }
+  });
+}
+
+// ── TABLES ───────────────────────────────────────────────────────
+function buildCustosTable() {
+  const total = CUSTOS_CATS.reduce((s,c)=>s+c.fev,0);
+  let html = '';
+  CUSTOS_CATS.slice().sort((a,b)=>b.fev-a.fev).forEach(c => {
+    const diff = c.fev - c.jan;
+    const pct  = c.jan > 0 ? (diff/c.jan*100) : 0;
+    const cls  = diff > 0 ? 'neg' : diff < 0 ? 'pos' : 'neu';
+    html += `<tr>
+      <td>${c.cat}</td>
+      <td style="text-align:right">${fmt(c.fev)}</td>
+      <td style="text-align:right">${fmt(c.jan)}</td>
+      <td style="text-align:right">${fmt(diff)}</td>
+      <td style="text-align:right">${(c.fev/total*100).toFixed(1)}%</td>
+    </tr>`;
+  });
+  document.getElementById('tbCustos').innerHTML = html;
+}
+
+function buildCustosDetalhadoTable() {
+  const total = CUSTOS_CATS.reduce((s,c)=>s+c.fev,0);
+  let html = '';
+  CUSTOS_CATS.slice().sort((a,b)=>b.fev-a.fev).forEach((c,i) => {
+    const diff = c.fev - c.jan;
+    const pct  = c.jan > 0 ? (diff/c.jan*100).toFixed(1) : '0.0';
+    const cls  = diff > 0 ? 'neg' : diff < 0 ? 'pos' : 'neu';
+    html += `<tr>
+      <td style="color:var(--g500)">${i+1}</td>
+      <td>${c.cat}</td>
+      <td style="text-align:right">${fmt(c.fev)}</td>
+      <td style="text-align:right">${fmt(c.jan)}</td>
+      <td style="text-align:right;color:${diff>0?'var(--red)':diff<0?'var(--green)':'var(--g500)'}">${fmt(diff)}</td>
+      <td><span class="badge ${cls}">${diff>=0?'+':''}${pct}%</span></td>
+      <td style="text-align:right">${(c.fev/total*100).toFixed(1)}%</td>
+    </tr>`;
+  });
+  document.getElementById('tbCustosDetalhado').innerHTML = html;
+}
+
+let currentPage = 1;
+const PAGE_SIZE = 10;
+
+function filterTransacoes() {
+  currentPage = 1;
+  renderTransacoes();
+}
+
+function renderTransacoes() {
+  const mes   = document.getElementById('filterMes').value;
+  const banco = document.getElementById('filterBanco').value;
+  const tipo  = document.getElementById('filterTipo').value;
+
+  let filtered = TRANSACOES.filter(t => {
+    const m = t.data.split('/')[1] === '01' ? 'Jan' : 'Fev';
+    if (mes && m !== mes) return false;
+    if (banco && t.banco !== banco) return false;
+    if (tipo && t.tipo !== tipo) return false;
+    return true;
+  });
+
+  const total = filtered.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const slice = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  let html = '';
+  slice.forEach(t => {
+    const color = t.tipo === 'Entrada' ? 'var(--green)' : 'var(--red)';
+    const sign  = t.tipo === 'Entrada' ? '+' : '-';
+    html += `<tr>
+      <td>${t.data}</td>
+      <td>${t.desc}</td>
+      <td><span class="badge blue">${t.cat}</span></td>
+      <td><span class="badge ${t.tipo==='Entrada'?'pos':'neg'}">${t.tipo}</span></td>
+      <td>${t.banco}</td>
+      <td style="text-align:right;color:${color};font-weight:600">${sign}${fmt(t.valor)}</td>
+    </tr>`;
+  });
+  document.getElementById('tbTransacoes').innerHTML = html;
+
+  // pagination
+  let pgHtml = `<span class="page-info">${total} registros</span>`;
+  const prev = `<button class="page-btn" onclick="changePage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  const next = `<button class="page-btn" onclick="changePage(${currentPage+1})" ${currentPage>=pages?'disabled':''}>›</button>`;
+  let nums = '';
+  for(let p=Math.max(1,currentPage-1); p<=Math.min(pages,currentPage+2); p++) {
+    nums += `<button class="page-btn ${p===currentPage?'active':''}" onclick="changePage(${p})">${p}</button>`;
+  }
+  document.getElementById('pagination').innerHTML = pgHtml + prev + nums + next;
+}
+
+function changePage(p) {
+  const mes  = document.getElementById('filterMes').value;
+  const banco= document.getElementById('filterBanco').value;
+  const tipo = document.getElementById('filterTipo').value;
+  let filtered = TRANSACOES.filter(t => {
+    const m = t.data.split('/')[1] === '01' ? 'Jan' : 'Fev';
+    if (mes && m !== mes) return false;
+    if (banco && t.banco !== banco) return false;
+    if (tipo && t.tipo !== tipo) return false;
+    return true;
+  });
+  const pages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (p < 1 || p > pages) return;
+  currentPage = p;
+  renderTransacoes();
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────
+const PAGE_TITLES = {
+  'visao-geral':'Visão Geral','evolucao':'Evolução Temporal','custos':'Breakdown de Custos',
+  'fluxo':'Fluxo de Caixa','tabela-custos':'Tabela de Custos','transacoes':'Transações',
+  'tendencias':'Tendências e Projeções','alertas':'Alertas Financeiros',
+  'assistente':'Assistente CFO com IA','relatorios':'Relatórios e Exportação',
+};
+
+function showView(id, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-'+id);
+  if (view) view.classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
+  if (id === 'transacoes') renderTransacoes();
+}
+
+// ── CHAT ─────────────────────────────────────────────────────────
+const AI_RESPONSES = {
+  'maior margem': 'Analisando os dados, <strong>Dezembro/2025</strong> foi o mês com maior margem: <strong>9,0%</strong> sobre faturamento de R$ 422.000. O lucro líquido foi de R$ 38.000. Em comparação, Janeiro/26 caiu para 1,0% e Fevereiro/26 entrou em território negativo (-2,4%).',
+  'maiores custos': 'Os <strong>3 maiores custos</strong> em Fev/26 são:<br><br>1. <strong>Salários + VT + VR + VA</strong> — R$ 88.000 (24% do faturamento)<br>2. <strong>Equipe Técnica</strong> — R$ 47.000 (13,2%)<br>3. <strong>Insumos</strong> — R$ 41.000 (11,5%)<br><br>Juntos representam <strong>48,7%</strong> do total de custos.',
+  'breakeven': 'Com base nos custos atuais de R$ 366.100/mês, o <strong>ponto de equilíbrio</strong> está em aproximadamente <strong>R$ 366K de faturamento</strong>.<br><br>Em Fev/26 faturamos R$ 357,5K — <strong>R$ 8.600 abaixo do break-even</strong>. Para atingir 5% de margem, precisaríamos de <strong>R$ 384K/mês</strong> mantendo custos constantes.',
+  'fluxo de caixa': 'Em <strong>Fev/26</strong>:<br>• Entradas: R$ 394.000<br>• Saídas: R$ 402.600<br>• <strong>Saldo do período: -R$ 8.600</strong><br><br>Saldo consolidado atual: R$ 85.100 distribuídos em 5 bancos. Se o déficit mensal se mantiver, o caixa se esgota em aproximadamente <strong>10 meses</strong>.',
+  'fev/26': 'Análise completa de <strong>Fevereiro/2026</strong>:<br><br>📉 Faturamento: R$ 357,5K (-9,5% vs Jan)<br>📉 Lucro: -R$ 8.600 (margem -2,4%)<br>📈 Custos: R$ 366,1K (+5,2% vs Jan)<br>🏦 Saldo: R$ 85,1K<br><br><strong>Pontos críticos:</strong> Margem negativa pelo 2º mês, queda contínua no faturamento, insumos acima da meta (+17%).',
+  'ações': 'Com base nos dados atuais, recomendo as seguintes <strong>ações prioritárias</strong>:<br><br>1. <strong>Urgente:</strong> Renegociar fornecedores de Insumos (meta: -15%)<br>2. <strong>Curto prazo:</strong> Revisar campanhas de marketing — R$ 14,5K/mês sem ROI mensurado<br>3. <strong>Médio prazo:</strong> Plano de recuperação de faturamento (+9% para Mar/26)<br>4. <strong>Atenção:</strong> Parcela de financiamento termina em Mar/26 → libera R$ 18K/mês',
+};
+
+function getAIResponse(msg) {
+  const m = msg.toLowerCase();
+  if (m.includes('margem')) return AI_RESPONSES['maior margem'];
+  if (m.includes('custo')) return AI_RESPONSES['maiores custos'];
+  if (m.includes('breakeven') || m.includes('equilíbrio') || m.includes('break')) return AI_RESPONSES['breakeven'];
+  if (m.includes('fluxo') || m.includes('caixa')) return AI_RESPONSES['fluxo de caixa'];
+  if (m.includes('fev') || m.includes('fevereiro')) return AI_RESPONSES['fev/26'];
+  if (m.includes('ação') || m.includes('ações') || m.includes('recomend')) return AI_RESPONSES['ações'];
+  return 'Analisando seus dados financeiros... Com faturamento de <strong>R$ 357,5K</strong> e margem de <strong>-2,4%</strong> em Fev/26, há pontos de atenção importantes. Você pode perguntar sobre margens, custos, fluxo de caixa, projeções ou ações recomendadas.';
+}
+
+function appendMsg(text, isUser) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (isUser ? 'user' : 'ai');
+  div.innerHTML = `
+    <div class="msg-avatar ${isUser?'usr':'ai'}">${isUser?'G':'C'}</div>
+    <div class="msg-bubble">${isUser ? text : text}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  appendMsg(txt, true);
+  inp.value = '';
+  inp.style.height = 'auto';
+  setTimeout(() => {
+    appendMsg(getAIResponse(txt), false);
+  }, 600);
+}
+
+function sendSuggestion(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  sendChat();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ── EXPORT ───────────────────────────────────────────────────────
+function printReport(type) {
+  alert('Relatório "' + type + '" preparado para impressão.\n\nUse Ctrl+P (ou Cmd+P) para salvar como PDF.');
+  window.print();
+}
+
+function exportCSV(type) {
+  type = type || 'transacoes';
+  let csv = '', filename = '';
+  if (type === 'transacoes') {
+    filename = 'cfo_agent_transacoes.csv';
+    csv = 'Data,Descricao,Categoria,Tipo,Banco,Valor\n';
+    TRANSACOES.forEach(t => { csv += `${t.data},"${t.desc}","${t.cat}",${t.tipo},"${t.banco}",${t.valor}\n`; });
+  } else if (type === 'custos') {
+    filename = 'cfo_agent_custos.csv';
+    csv = 'Categoria,Jan/26,Fev/26,Variacao,Variacao%\n';
+    CUSTOS_CATS.forEach(c => { const d=c.fev-c.jan; csv += `"${c.cat}",${c.jan},${c.fev},${d},${c.jan>0?(d/c.jan*100).toFixed(1):0}%\n`; });
+  } else {
+    filename = 'cfo_agent_faturamento.csv';
+    csv = 'Mes,Faturamento,Custos,Lucro,Margem%\n';
+    MONTHS.slice(0,3).forEach((m,i) => { csv += `${m},${FAT[i]},${CUSTOS_TOT[i]},${LUCRO[i]},${MARGEM[i]}\n`; });
+  }
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function updateMonth() {
+  const m = document.getElementById('monthSelect').value;
+  // In a real app, update all charts with the selected month's data
+  console.log('Month changed to:', m);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initCharts();
+  buildCustosTable();
+  buildCustosDetalhadoTable();
+  renderTransacoes();
+});
+</script>
+</body>
+</html>

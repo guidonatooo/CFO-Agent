@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFO Agent — Entrar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --royal: #0E2F7A;
+    --royal-mid: #1A4BBF;
+    --royal-light: #2D63E0;
+    --royal-pale: #EBF0FC;
+    --gold: #C9971C;
+    --gold-light: #F0C040;
+    --white: #FFFFFF;
+    --off-white: #F6F8FD;
+    --gray-100: #EEF1F8;
+    --gray-300: #C4CEDE;
+    --gray-500: #8494B2;
+    --gray-700: #3C4E6E;
+    --dark: #08163A;
+    --danger: #D63047;
+    --success: #0F7B5A;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --radius: 12px;
+    --shadow: 0 4px 32px rgba(14, 47, 122, 0.12);
+    --shadow-lg: 0 12px 64px rgba(14, 47, 122, 0.22);
+  }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font-body);
+    color: var(--dark);
+    background: var(--dark);
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  .login-wrapper {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── LEFT PANEL ── */
+  .login-left {
+    flex: 1;
+    background: linear-gradient(160deg, #08163A 0%, #0E2F7A 55%, #1A4BBF 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-left::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 30% 80%, rgba(45, 99, 224, 0.3) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 70% 20%, rgba(201, 151, 28, 0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Decorative grid */
+  .login-left::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  .left-header { position: relative; z-index: 1; }
+
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; margin-bottom: 64px;
+  }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: var(--royal-mid);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .logo-icon svg { width: 22px; height: 22px; fill: none; stroke: white; stroke-width: 2; }
+  .logo-text .brand { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: white; letter-spacing: 0.06em; line-height: 1; display: block; }
+  .logo-text .sub { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.45); letter-spacing: 0.18em; text-transform: uppercase; }
+
+  .left-headline { position: relative; z-index: 1; }
+  .left-headline h2 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 3.5vw, 52px);
+    font-weight: 700; line-height: 1.1;
+    color: white; margin-bottom: 20px;
+  }
+  .left-headline h2 em { font-style: italic; color: var(--gold-light); }
+  .left-headline p {
+    font-size: 16px; color: rgba(255,255,255,0.6);
+    line-height: 1.7; max-width: 380px;
+  }
+
+  .left-stats {
+    display: flex; gap: 32px;
+    position: relative; z-index: 1;
+    margin-top: 48px;
+  }
+  .left-stat .num {
+    font-family: var(--font-display); font-size: 32px; font-weight: 700;
+    color: white; line-height: 1;
+  }
+  .left-stat .lbl { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+  /* Mini dashboard card */
+  .mini-dash {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 20px;
+    margin-top: 40px; position: relative; z-index: 1;
+    backdrop-filter: blur(8px);
+  }
+  .mini-dash-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .mini-dash-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; }
+  .mini-dash-badge { font-size: 10px; font-weight: 600; background: rgba(39,201,63,0.15); color: #27C93F; padding: 3px 8px; border-radius: 100px; }
+  .mini-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mini-kpi { text-align: center; }
+  .mini-kpi-val { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: white; }
+  .mini-kpi-lbl { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .mini-chart {
+    margin-top: 16px; height: 40px;
+    display: flex; align-items: flex-end; gap: 3px;
+  }
+  .mini-chart-bar { flex: 1; border-radius: 2px 2px 0 0; transition: opacity 0.2s; }
+
+  .left-footer { position: relative; z-index: 1; }
+  .left-footer p { font-size: 13px; color: rgba(255,255,255,0.3); }
+
+  /* ── RIGHT PANEL ── */
+  .login-right {
+    width: 480px;
+    min-width: 480px;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 56px;
+    overflow-y: auto;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .form-top {
+    margin-bottom: 40px;
+  }
+
+  .form-logo-mobile {
+    display: none;
+    align-items: center; gap: 10px;
+    text-decoration: none; margin-bottom: 32px;
+  }
+  .form-logo-mobile .logo-icon { width: 36px; height: 36px; }
+  .form-logo-mobile .logo-icon svg { width: 18px; height: 18px; }
+  .form-logo-mobile .brand { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--dark); }
+
+  .form-top h1 {
+    font-family: var(--font-display);
+    font-size: 36px; font-weight: 700;
+    color: var(--dark); line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .form-top p { font-size: 15px; color: var(--gray-500); line-height: 1.6; }
+
+  /* Access badge */
+  .access-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--royal-pale);
+    border: 1px solid rgba(14, 47, 122, 0.12);
+    border-radius: 100px;
+    padding: 5px 12px 5px 8px;
+    font-size: 12px; font-weight: 600; color: var(--royal);
+    margin-bottom: 24px;
+  }
+  .access-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--royal-mid);
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 20px; }
+  .form-label {
+    display: block;
+    font-size: 13px; font-weight: 600; color: var(--gray-700);
+    margin-bottom: 8px; letter-spacing: 0.02em;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; fill: none; stroke: var(--gray-300); stroke-width: 2;
+    pointer-events: none; transition: stroke 0.2s;
+  }
+  .form-input {
+    width: 100%;
+    font-family: var(--font-body); font-size: 15px;
+    color: var(--dark);
+    background: var(--off-white);
+    border: 1.5px solid var(--gray-100);
+    border-radius: var(--radius);
+    padding: 12px 14px 12px 42px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input::placeholder { color: var(--gray-300); }
+  .form-input:focus {
+    border-color: var(--royal-light);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(45, 99, 224, 0.1);
+  }
+  .form-input:focus + svg,
+  .input-wrap:focus-within svg { stroke: var(--royal-mid); }
+
+  /* Password toggle */
+  .pw-toggle {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; padding: 4px;
+    color: var(--gray-300); transition: color 0.2s;
+    display: flex; align-items: center;
+  }
+  .pw-toggle:hover { color: var(--gray-700); }
+  .pw-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+  .form-row-util {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .remember-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--gray-500); cursor: pointer;
+  }
+  .remember-label input[type="checkbox"] {
+    width: 16px; height: 16px; accent-color: var(--royal-mid); cursor: pointer;
+  }
+  .forgot-link {
+    font-size: 13px; font-weight: 600; color: var(--royal-mid);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .forgot-link:hover { color: var(--royal); }
+
+  /* Submit button */
+  .btn-submit {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+    font-family: var(--font-body); font-size: 15px; font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, var(--royal-light), var(--royal-mid));
+    border: none; padding: 14px; border-radius: var(--radius);
+    cursor: pointer; text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+    box-shadow: 0 4px 20px rgba(14, 47, 122, 0.35);
+    letter-spacing: 0.02em;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(14, 47, 122, 0.45); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit svg { width: 16px; height: 16px; fill: none; stroke: white; stroke-width: 2; }
+
+  /* Loading state */
+  .btn-submit.loading { opacity: 0.8; pointer-events: none; }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .btn-submit.loading .btn-arrow { display: none; }
+  .btn-submit.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error message */
+  .error-msg {
+    display: none;
+    background: rgba(214, 48, 71, 0.08);
+    border: 1px solid rgba(214, 48, 71, 0.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px; color: var(--danger);
+    margin-bottom: 20px;
+    align-items: center; gap: 8px;
+  }
+  .error-msg.show { display: flex; }
+  .error-msg svg { width: 14px; height: 14px; fill: none; stroke: var(--danger); stroke-width: 2; flex-shrink: 0; }
+
+  /* Divider */
+  .form-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 28px 0;
+  }
+  .form-divider::before, .form-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--gray-100);
+  }
+  .form-divider span { font-size: 12px; color: var(--gray-300); white-space: nowrap; }
+
+  /* Security note */
+  .security-note {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 24px;
+    padding: 12px 16px;
+    background: var(--off-white);
+    border-radius: 8px;
+    font-size: 12px; color: var(--gray-500);
+  }
+  .security-note svg { width: 14px; height: 14px; fill: none; stroke: var(--gray-300); stroke-width: 2; flex-shrink: 0; }
+
+  /* Back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--gray-500);
+    text-decoration: none; margin-top: 28px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--royal); }
+  .back-link svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .login-wrapper { flex-direction: column; overflow: auto; }
+    .login-left { display: none; }
+    .login-right { width: 100%; min-width: 0; height: 100vh; padding: 40px 32px; }
+    .form-logo-mobile { display: flex; }
+    body { overflow: auto; }
+    html, body { height: auto; }
+  }
+  @media (max-width: 480px) {
+    .login-right { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+  <!-- LEFT PANEL -->
+  <div class="login-left">
+    <div class="left-header">
+      <a href="../landing-page/index.html" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 20 20"><polyline points="2,14 7,8 11,12 18,4"/><line x1="16" y1="4" x2="20" y2="4"/><line x1="20" y1="4" x2="20" y2="8"/></svg>
+        </div>
+        <div class="logo-text">
+          <span class="brand">CFO Agent</span>
+          <span class="sub">Financial Intelligence</span>
+        </div>
+      </a>
+
+      <div class="left-headline">
+        <h2>Seu painel financeiro<br><em>te espera.</em></h2>
+        <p>Acesse seu dashboard completo com métricas em tempo real, alertas inteligentes e análises com IA.</p>
+
+        <div class="left-stats">
+          <div class="left-stat">
+            <div class="num">+40</div>
+            <div class="lbl">Métricas ativas</div>
+          </div>
+          <div class="left-stat">
+            <div class="num">100%</div>
+            <div class="lbl">Dados seguros</div>
+          </div>
+          <div class="left-stat">
+            <div class="num">Real-time</div>
+            <div class="lbl">Atualização</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini dashboard preview -->
+    <div class="mini-dash">
+      <div class="mini-dash-header">
+        <span class="mini-dash-title">Dashboard Financeiro · Abr/26</span>
+        <span class="mini-dash-badge">● Ao vivo</span>
+      </div>
+      <div class="mini-kpis">
+        <div class="mini-kpi">
+          <div class="mini-kpi-val">R$ 412K</div>
+          <div class="mini-kpi-lbl">Faturamento</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-val">R$ 38K</div>
+          <div class="mini-kpi-lbl">Lucro Líquido</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-val">9,2%</div>
+          <div class="mini-kpi-lbl">Margem</div>
+        </div>
+      </div>
+      <div class="mini-chart">
+        <div class="mini-chart-bar" style="height:55%;background:rgba(45,99,224,0.5);"></div>
+        <div class="mini-chart-bar" style="height:70%;background:rgba(45,99,224,0.5);"></div>
+        <div class="mini-chart-bar" style="height:60%;background:rgba(45,99,224,0.5);"></div>
+        <div class="mini-chart-bar" style="height:80%;background:rgba(45,99,224,0.6);"></div>
+        <div class="mini-chart-bar" style="height:65%;background:rgba(45,99,224,0.5);"></div>
+        <div class="mini-chart-bar" style="height:90%;background:rgba(45,99,224,0.7);"></div>
+        <div class="mini-chart-bar" style="height:75%;background:rgba(45,99,224,0.6);"></div>
+        <div class="mini-chart-bar" style="height:100%;background:rgba(240,192,64,0.7);"></div>
+      </div>
+    </div>
+
+    <div class="left-footer">
+      <p>© 2026 CFO Agent · Acesso restrito a clientes</p>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="login-right">
+    <div class="form-container">
+
+      <a href="../landing-page/index.html" class="form-logo-mobile">
+        <div class="logo-icon" style="background:var(--royal-mid);">
+          <svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="2"><polyline points="2,14 7,8 11,12 18,4"/></svg>
+        </div>
+        <span class="brand">CFO Agent</span>
+      </a>
+
+      <div class="form-top">
+        <div class="access-badge">
+          <div class="access-dot"></div>
+          Acesso por convite
+        </div>
+        <h1>Bem-vindo<br>de volta.</h1>
+        <p>Entre com suas credenciais para acessar seu painel financeiro.</p>
+      </div>
+
+      <!-- Error message -->
+      <div class="error-msg" id="errorMsg">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="errorText">E-mail ou senha incorretos. Tente novamente.</span>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <div class="input-wrap">
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            >
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Senha</label>
+          <div class="input-wrap" style="position:relative;">
+            <input
+              type="password"
+              id="password"
+              class="form-input"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            >
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <button type="button" class="pw-toggle" onclick="togglePassword()" id="pwToggle" aria-label="Mostrar senha">
+              <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row-util">
+          <label class="remember-label">
+            <input type="checkbox" id="remember">
+            Lembrar de mim
+          </label>
+          <a href="#" class="forgot-link" onclick="showForgotMessage(event)">Esqueci minha senha</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">Entrar no Dashboard</span>
+          <svg class="btn-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+          <div class="spinner"></div>
+        </button>
+
+      </form>
+
+      <div class="security-note">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Conexão segura com criptografia SSL. Seus dados estão protegidos.
+      </div>
+
+      <a href="../landing-page/index.html" class="back-link">
+        <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+        Voltar para o site
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      input.type = 'password';
+      eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+
+  function showError(msg) {
+    const errDiv = document.getElementById('errorMsg');
+    document.getElementById('errorText').textContent = msg;
+    errDiv.classList.add('show');
+  }
+
+  function hideError() {
+    document.getElementById('errorMsg').classList.remove('show');
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    hideError();
+
+    const btn = document.getElementById('submitBtn');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    // Basic validation
+    if (!email || !password) {
+      showError('Preencha todos os campos.');
+      return;
+    }
+
+    // Loading state
+    btn.classList.add('loading');
+    btn.querySelector('.btn-text').textContent = 'Entrando...';
+
+    // Simulate authentication (replace with real auth)
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      btn.querySelector('.btn-text').textContent = 'Entrar no Dashboard';
+
+      // Demo: any credentials redirect to dashboard
+      // In production: validate against backend
+      if (email && password.length >= 6) {
+        window.location.href = '../dashboard/index.html';
+      } else {
+        showError('A senha deve ter pelo menos 6 caracteres.');
+      }
+    }, 1200);
+  }
+
+  function showForgotMessage(e) {
+    e.preventDefault();
+    showError('Entre em contato com o suporte CFO Agent para redefinir sua senha: suporte@cfoagent.com.br');
+  }
+
+  // Clear error on input
+  document.getElementById('email').addEventListener('input', hideError);
+  document.getElementById('password').addEventListener('input', hideError);
+</script>
+</body>
+</html>
