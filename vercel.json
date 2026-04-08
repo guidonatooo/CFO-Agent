@@ -1,8 +1,17 @@
 {
-  "rewrites": [
-    { "source": "/",          "destination": "/landing-page/index.html" },
-    { "source": "/login",     "destination": "/login/index.html" },
-    { "source": "/dashboard", "destination": "/dashboard/index.html" },
-    { "source": "/api/(.*)",  "destination": "/api/$1" }
+  "version": 2,
+  "builds": [
+    { "src": "landing-page/index.html", "use": "@vercel/static" },
+    { "src": "login/index.html",        "use": "@vercel/static" },
+    { "src": "dashboard/index.html",    "use": "@vercel/static" },
+    { "src": "js/**",                   "use": "@vercel/static" },
+    { "src": "api/**",                  "use": "@vercel/node"   }
+  ],
+  "routes": [
+    { "src": "/",          "dest": "/landing-page/index.html" },
+    { "src": "/login",     "dest": "/login/index.html"        },
+    { "src": "/dashboard", "dest": "/dashboard/index.html"    },
+    { "src": "/js/(.*)",   "dest": "/js/$1"                   },
+    { "src": "/api/(.*)",  "dest": "/api/$1"                  }
   ]
 }
