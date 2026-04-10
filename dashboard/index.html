@@ -813,14 +813,10 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
         </div>
         <div class="chart-card">
           <div class="chart-header"><div><div class="chart-title">Resumo de Tendências</div></div></div>
-          <div class="alerts-list">
-            <div class="alert-item warning">
-              <div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
-              <div><div class="alert-title">Faturamento em queda (-9,5%/mês)</div><div class="alert-desc">Projeção Mar/26: R$ 323K se tendência se mantiver. Ação necessária para reverter ciclo.</div></div>
-            </div>
+          <div class="alerts-list" id="tendencias-resumo">
             <div class="alert-item info">
-              <div class="alert-icon info"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></div>
-              <div><div class="alert-title">Ponto de equilíbrio em R$ 366K</div><div class="alert-desc">Para zero margem, faturamento precisa superar R$ 366K. Meta para Mar/26: R$ 390K (+9%).</div></div>
+              <div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+              <div><div class="alert-title">Adicione dados para ver tendências</div><div class="alert-desc">Cadastre faturamento e custos em "Entrada de Dados" para gerar projeções automáticas.</div></div>
             </div>
           </div>
         </div>
@@ -831,43 +827,12 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
          VIEW 8: ALERTAS
     ═══════════════════════════════════════ -->
     <div class="view" id="view-alertas">
-      <div style="margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(255,95,87,0.12);border:1px solid rgba(255,95,87,0.25);">
-          <div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div>
-          <span style="font-size:13px;font-weight:600;color:var(--red)">3 Críticos</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(240,192,64,0.12);border:1px solid rgba(240,192,64,0.25);">
-          <div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div>
-          <span style="font-size:13px;font-weight:600;color:var(--amber)">4 Avisos</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(45,99,224,0.12);border:1px solid rgba(45,99,224,0.25);">
-          <div style="width:8px;height:8px;border-radius:50%;background:var(--royal-light)"></div>
-          <span style="font-size:13px;font-weight:600;color:#7BA8FF">3 Informativos</span>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-header"><div class="chart-title">Alertas Críticos</div></div>
-        <div class="alerts-list" style="margin-bottom:0">
-          <div class="alert-item critical"><div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="alert-title">Margem negativa — 2º mês consecutivo</div><div class="alert-desc">Fev/26: -2,4% · Jan/26: +1,0%. Tendência de deterioração acelerada. Revisar estrutura de custos urgente.</div><div class="alert-time">01/03/2026</div></div></div>
-          <div class="alert-item critical"><div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="alert-title">Folha de pagamento representa 24% do faturamento</div><div class="alert-desc">R$ 88.000 em Fev/26 vs R$ 357.500 faturados. Limite sugerido: 20%. Avaliar redimensionamento da equipe.</div><div class="alert-time">01/03/2026</div></div></div>
-          <div class="alert-item critical"><div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="alert-title">Saídas superam entradas em R$ 8.600</div><div class="alert-desc">Saldo do mês negativo pela primeira vez em 6 meses. Caixa disponível: R$ 85.100 (risco de liquidez em ~10 meses).</div><div class="alert-time">28/02/2026</div></div></div>
-        </div>
-      </div>
-      <div class="chart-card" style="margin-top:16px">
-        <div class="chart-header"><div class="chart-title">Avisos</div></div>
-        <div class="alerts-list" style="margin-bottom:0">
-          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Insumos acima da meta (+17,1%)</div><div class="alert-desc">R$ 41.000 vs meta R$ 35.000. Renegociar contratos com fornecedores até Abr/26.</div><div class="alert-time">01/03/2026</div></div></div>
-          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Faturamento caindo 3 meses seguidos</div><div class="alert-desc">Dez/25: R$ 422K → Jan/26: R$ 395K → Fev/26: R$ 357K. Queda acumulada de -15,4%.</div><div class="alert-time">28/02/2026</div></div></div>
-          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Investimentos pausados em Fev/26</div><div class="alert-desc">R$ 0 investido em Fev/26 vs R$ 8.000 em Jan/26. Avaliar impacto na capacidade produtiva.</div><div class="alert-time">01/03/2026</div></div></div>
-          <div class="alert-item warning"><div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-title">Marketing: ROI não mensurado</div><div class="alert-desc">R$ 14.500 gastos em mídia paga em Fev/26. Sem rastreamento de conversões ativo.</div><div class="alert-time">28/02/2026</div></div></div>
-        </div>
-      </div>
-      <div class="chart-card" style="margin-top:16px">
-        <div class="chart-header"><div class="chart-title">Informativos</div></div>
-        <div class="alerts-list" style="margin-bottom:0">
-          <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Saldo Finpet caiu 33%</div><div class="alert-desc">De R$ 18.000 (Jan) para R$ 12.000 (Fev). Verificar movimentações pendentes.</div><div class="alert-time">28/02/2026</div></div></div>
-          <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Ticket médio cresceu +3,1%</div><div class="alert-desc">R$ 4.200 em Fev/26 vs R$ 4.074 em Jan/26. Tendência positiva mesmo com queda no volume.</div><div class="alert-time">01/03/2026</div></div></div>
-          <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Parcela de financiamento quitada em Mar/26</div><div class="alert-desc">Última parcela do contrato em Mar/26. Libera R$ 18.000/mês a partir de Abr/26.</div><div class="alert-time">28/02/2026</div></div></div>
+      <div id="alertas-container">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Alertas</div></div>
+          <div class="alerts-list" style="margin-bottom:0">
+            <div class="alert-item info"><div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div><div class="alert-title">Sem dados para analisar</div><div class="alert-desc">Adicione faturamento e custos em "Entrada de Dados" para que o sistema gere alertas automáticos.</div></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1909,6 +1874,191 @@ function updateMonth() {
   // future: re-filter charts by selected month
 }
 
+// ── KPI RENDER ────────────────────────────────────────────────────
+function renderKPIs() {
+  const rawFat = CFOData.getFaturamento() || [];
+  const rawCus = CFOData.getCustos() || [];
+  const rawSal = CFOData.getSaldos() || [];
+  const rawTxn = CFOData.getTransacoes() || [];
+
+  const fmt = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+  const fmtPct = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+
+  function set(id, value, delta, deltaClass) {
+    const valEl = document.getElementById(id);
+    const deltaEl = document.getElementById(id + '-delta');
+    if (valEl) valEl.textContent = value;
+    if (deltaEl) { deltaEl.textContent = delta; deltaEl.className = 'kpi-delta ' + (deltaClass || 'neu'); }
+  }
+
+  const totalFat = rawFat.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const totalCus = rawCus.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const totalLucro = totalFat - totalCus;
+  const margem = totalFat > 0 ? (totalLucro / totalFat * 100) : 0;
+  const saldo = rawSal.reduce((s, r) => s + parseFloat(r.saldoFin || r.saldo_final || 0), 0);
+  const ticket = rawFat.length > 0 ? totalFat / rawFat.length : 0;
+  const entradas = rawTxn.filter(r => r.tipo === 'Crédito').reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const saidas = rawTxn.filter(r => r.tipo === 'Débito').reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+
+  if (rawFat.length) {
+    set('kpi-fat', fmt(totalFat), rawFat.length + ' registros', 'neu');
+    set('kpi-lucro', fmt(totalLucro), fmtPct(margem), totalLucro >= 0 ? 'pos' : 'neg');
+    set('kpi-margem', fmtPct(margem), 'margem líquida', margem >= 0 ? 'pos' : 'neg');
+    set('kpi-custos', fmt(totalCus), rawCus.length + ' lançamentos', 'neu');
+    if (rawFat.length > 0) set('kpi-ticket', fmt(ticket), 'média por registro', 'neu');
+  }
+  if (rawSal.length) set('kpi-saldo', fmt(saldo), rawSal.length + ' contas', 'neu');
+  if (rawTxn.length) {
+    set('kpi-entradas', fmt(entradas), rawTxn.filter(r => r.tipo === 'Crédito').length + ' transações', 'pos');
+    set('kpi-saidas', fmt(saidas), rawTxn.filter(r => r.tipo === 'Débito').length + ' transações', 'neg');
+  }
+}
+
+// ── ALERTAS DINÂMICOS ─────────────────────────────────────────────
+function gerarAlertas() {
+  const rawFat = CFOData.getFaturamento() || [];
+  const rawCus = CFOData.getCustos() || [];
+  const rawSal = CFOData.getSaldos() || [];
+  const rawTxn = CFOData.getTransacoes() || [];
+  const alertas = [];
+
+  const totalFat = rawFat.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const totalCus = rawCus.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const margem = totalFat > 0 ? ((totalFat - totalCus) / totalFat * 100) : 0;
+
+  // Margem negativa
+  if (rawFat.length && margem < 0) {
+    alertas.push({ tipo: 'critical', titulo: 'Margem líquida negativa', desc: `Margem atual: ${margem.toFixed(1)}%. Custos (R$ ${Math.round(totalCus).toLocaleString('pt-BR')}) superam o faturamento (R$ ${Math.round(totalFat).toLocaleString('pt-BR')}).` });
+  } else if (rawFat.length && margem < 10) {
+    alertas.push({ tipo: 'warning', titulo: `Margem baixa: ${margem.toFixed(1)}%`, desc: 'Margem abaixo de 10%. Revise a estrutura de custos para aumentar a rentabilidade.' });
+  }
+
+  // Custos acima de 80% do faturamento
+  if (rawFat.length && totalFat > 0 && (totalCus / totalFat) > 0.8) {
+    alertas.push({ tipo: 'warning', titulo: 'Custos representam ' + Math.round(totalCus / totalFat * 100) + '% do faturamento', desc: `R$ ${Math.round(totalCus).toLocaleString('pt-BR')} em custos vs R$ ${Math.round(totalFat).toLocaleString('pt-BR')} faturados. Meta recomendada: abaixo de 70%.` });
+  }
+
+  // Faturamento por mês — queda consecutiva
+  const mesFat = {};
+  rawFat.forEach(r => { if (r.mes) mesFat[r.mes] = (mesFat[r.mes] || 0) + parseFloat(r.valor || 0); });
+  const mesesOrdenados = Object.keys(mesFat).sort();
+  if (mesesOrdenados.length >= 2) {
+    const ult = mesFat[mesesOrdenados[mesesOrdenados.length - 1]];
+    const pen = mesFat[mesesOrdenados[mesesOrdenados.length - 2]];
+    const varPct = pen > 0 ? ((ult - pen) / pen * 100) : 0;
+    if (varPct < -10) {
+      alertas.push({ tipo: 'warning', titulo: `Faturamento caiu ${Math.abs(varPct).toFixed(1)}% no último mês`, desc: `${mesesOrdenados[mesesOrdenados.length - 2]}: R$ ${Math.round(pen).toLocaleString('pt-BR')} → ${mesesOrdenados[mesesOrdenados.length - 1]}: R$ ${Math.round(ult).toLocaleString('pt-BR')}.` });
+    } else if (varPct > 10) {
+      alertas.push({ tipo: 'info', titulo: `Faturamento cresceu ${varPct.toFixed(1)}% no último mês`, desc: `${mesesOrdenados[mesesOrdenados.length - 2]}: R$ ${Math.round(pen).toLocaleString('pt-BR')} → ${mesesOrdenados[mesesOrdenados.length - 1]}: R$ ${Math.round(ult).toLocaleString('pt-BR')}.` });
+    }
+  }
+
+  // Fluxo de caixa negativo (saídas > entradas)
+  if (rawTxn.length) {
+    const entradas = rawTxn.filter(r => r.tipo === 'Crédito').reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+    const saidas = rawTxn.filter(r => r.tipo === 'Débito').reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+    if (saidas > entradas) {
+      alertas.push({ tipo: 'critical', titulo: 'Saídas superam entradas no período', desc: `Saídas: R$ ${Math.round(saidas).toLocaleString('pt-BR')} · Entradas: R$ ${Math.round(entradas).toLocaleString('pt-BR')}. Déficit: R$ ${Math.round(saidas - entradas).toLocaleString('pt-BR')}.` });
+    }
+  }
+
+  // Saldo consolidado
+  if (rawSal.length) {
+    const saldo = rawSal.reduce((s, r) => s + parseFloat(r.saldoFin || r.saldo_final || 0), 0);
+    if (saldo < 0) {
+      alertas.push({ tipo: 'critical', titulo: 'Saldo consolidado negativo', desc: `Saldo total: R$ ${Math.round(saldo).toLocaleString('pt-BR')}. Risco imediato de liquidez.` });
+    } else {
+      alertas.push({ tipo: 'info', titulo: `Saldo consolidado: R$ ${Math.round(saldo).toLocaleString('pt-BR')}`, desc: `${rawSal.length} conta(s) cadastrada(s). Saldo disponível no período.` });
+    }
+  }
+
+  if (!alertas.length) {
+    alertas.push({ tipo: 'info', titulo: 'Nenhum alerta crítico detectado', desc: 'Os indicadores financeiros estão dentro dos parâmetros normais. Continue monitorando.' });
+  }
+  return alertas;
+}
+
+function renderAlertas() {
+  const container = document.getElementById('alertas-container');
+  if (!container) return;
+  const rawFat = CFOData.getFaturamento() || [];
+  if (!rawFat.length) return; // leave default empty state
+
+  const alertas = gerarAlertas();
+  const criticos  = alertas.filter(a => a.tipo === 'critical');
+  const avisos    = alertas.filter(a => a.tipo === 'warning');
+  const infos     = alertas.filter(a => a.tipo === 'info');
+
+  const svgCritical = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  const svgWarning  = `<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const svgInfo     = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+  const svgFor = t => t === 'critical' ? svgCritical : t === 'warning' ? svgWarning : svgInfo;
+
+  const badgeHTML = `
+    <div style="margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap;">
+      ${criticos.length ? `<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(255,95,87,0.12);border:1px solid rgba(255,95,87,0.25);"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div><span style="font-size:13px;font-weight:600;color:var(--red)">${criticos.length} Crítico${criticos.length > 1 ? 's' : ''}</span></div>` : ''}
+      ${avisos.length ? `<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(240,192,64,0.12);border:1px solid rgba(240,192,64,0.25);"><div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div><span style="font-size:13px;font-weight:600;color:var(--amber)">${avisos.length} Aviso${avisos.length > 1 ? 's' : ''}</span></div>` : ''}
+      ${infos.length ? `<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;background:rgba(45,99,224,0.12);border:1px solid rgba(45,99,224,0.25);"><div style="width:8px;height:8px;border-radius:50%;background:var(--royal-light)"></div><span style="font-size:13px;font-weight:600;color:#7BA8FF">${infos.length} Informativo${infos.length > 1 ? 's' : ''}</span></div>` : ''}
+    </div>`;
+
+  const renderGroup = (lista, titulo) => lista.length ? `
+    <div class="chart-card" style="margin-bottom:16px">
+      <div class="chart-header"><div class="chart-title">${titulo}</div></div>
+      <div class="alerts-list" style="margin-bottom:0">
+        ${lista.map(a => `<div class="alert-item ${a.tipo}"><div class="alert-icon ${a.tipo}">${svgFor(a.tipo)}</div><div><div class="alert-title">${a.titulo}</div><div class="alert-desc">${a.desc}</div></div></div>`).join('')}
+      </div>
+    </div>` : '';
+
+  container.innerHTML = badgeHTML +
+    renderGroup(criticos, 'Alertas Críticos') +
+    renderGroup(avisos, 'Avisos') +
+    renderGroup(infos, 'Informativos');
+}
+
+function renderTendencias() {
+  const el = document.getElementById('tendencias-resumo');
+  if (!el) return;
+  const rawFat = CFOData.getFaturamento() || [];
+  const rawCus = CFOData.getCustos() || [];
+  if (!rawFat.length) return;
+
+  const mesFat = {};
+  rawFat.forEach(r => { if (r.mes) mesFat[r.mes] = (mesFat[r.mes] || 0) + parseFloat(r.valor || 0); });
+  const meses = Object.keys(mesFat).sort();
+  const totalFat = rawFat.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const totalCus = rawCus.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+  const margem = totalFat > 0 ? ((totalFat - totalCus) / totalFat * 100) : 0;
+  const fmt = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+
+  const items = [];
+
+  if (meses.length >= 2) {
+    const ult = mesFat[meses[meses.length - 1]];
+    const pen = mesFat[meses[meses.length - 2]];
+    const varPct = pen > 0 ? ((ult - pen) / pen * 100) : 0;
+    const tipo = varPct < -5 ? 'warning' : varPct > 5 ? 'info' : 'info';
+    const svgTrend = varPct < 0
+      ? `<svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>`
+      : `<svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>`;
+    items.push({ tipo, svg: svgTrend, titulo: `Faturamento ${varPct >= 0 ? '+' : ''}${varPct.toFixed(1)}% no último mês`, desc: `${meses[meses.length - 2]}: ${fmt(pen)} → ${meses[meses.length - 1]}: ${fmt(ult)}.` });
+  }
+
+  if (rawFat.length) {
+    const svgM = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    items.push({ tipo: margem < 0 ? 'warning' : 'info', svg: svgM, titulo: `Margem líquida: ${margem.toFixed(1)}%`, desc: `Faturamento total: ${fmt(totalFat)}. Custos: ${fmt(totalCus)}. Lucro: ${fmt(totalFat - totalCus)}.` });
+  }
+
+  if (!items.length) {
+    items.push({ tipo: 'info', svg: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`, titulo: 'Dados insuficientes para projeção', desc: 'Adicione pelo menos 2 meses de faturamento para gerar tendências.' });
+  }
+
+  el.innerHTML = items.map(it => `
+    <div class="alert-item ${it.tipo}">
+      <div class="alert-icon ${it.tipo}">${it.svg}</div>
+      <div><div class="alert-title">${it.titulo}</div><div class="alert-desc">${it.desc}</div></div>
+    </div>`).join('');
+}
+
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   populateMonthSelect();
@@ -1979,6 +2129,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTransacoes();
   populateTransacoesFilters();
   carregarConfiguracoes();
+  renderKPIs();
+  renderAlertas();
+  renderTendencias();
 });
 
 (function() {
@@ -2005,7 +2158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-logout').addEventListener('click', async function() {
       await window.Clerk.signOut();
-      window.location.href = '/login';
+      window.location.href = 'https://cfo-agent-five.vercel.app/';
     });
 
     // Run onboarding wizard for new users
@@ -2504,7 +2657,7 @@ function verificarOnboarding() {
 function mostrarWizard() {
   const overlay = document.createElement('div');
   overlay.id = 'wizard-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(8,22,58,0.92);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(4,11,30,0.97);display:flex;align-items:center;justify-content:center;';
   overlay.innerHTML = `
     <div style="background:#0E1E3D;border:1px solid rgba(26,75,191,0.4);border-radius:20px;padding:48px;width:520px;max-width:90vw;position:relative;">
       <div style="display:flex;gap:8px;margin-bottom:32px;justify-content:center;">
