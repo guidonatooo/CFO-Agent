@@ -6,7 +6,7 @@ window.CFOAuth = {
     return new Promise((resolve) => {
       const script = document.createElement('script');
       script.setAttribute('data-clerk-publishable-key', window.CFO_CONFIG.clerkKey);
-      script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+      script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js';
       script.crossOrigin = 'anonymous';
       script.onload = async () => {
         await window.Clerk.load();

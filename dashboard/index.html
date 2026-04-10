@@ -9,12 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="/js/db.js"></script>
-<script
-  async
-  crossorigin="anonymous"
-  data-clerk-publishable-key="pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk"
-  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -1664,36 +1658,37 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTransacoes();
 });
 
-window.addEventListener('load', async function() {
-  let attempts = 0;
-  while (!window.Clerk && attempts < 50) {
-    await new Promise(r => setTimeout(r, 100));
-    attempts++;
-  }
-  if (!window.Clerk) return;
+(function() {
+  var CLERK_KEY = 'pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk';
+  var s = document.createElement('script');
+  s.setAttribute('data-clerk-publishable-key', CLERK_KEY);
+  s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js';
+  s.crossOrigin = 'anonymous';
+  s.addEventListener('load', async function() {
+    await window.Clerk.load();
 
-  await window.Clerk.load();
+    if (!window.Clerk.user) {
+      window.location.href = '/login';
+      return;
+    }
 
-  if (!window.Clerk.user) {
-    window.location.href = '/login';
-    return;
-  }
+    const user = window.Clerk.user;
+    const email = user.primaryEmailAddress?.emailAddress || '';
+    const name = user.firstName || email.split('@')[0] || 'Usuário';
+    const initial = name.charAt(0).toUpperCase();
+    document.getElementById('user-avatar').textContent = initial;
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-email').textContent = email;
 
-  const user = window.Clerk.user;
-  const email = user.primaryEmailAddress?.emailAddress || '';
-  const name = user.firstName || email.split('@')[0] || 'Usuário';
-  const initial = name.charAt(0).toUpperCase();
-  document.getElementById('user-avatar').textContent = initial;
-  document.getElementById('user-name').textContent = name;
-  document.getElementById('user-email').textContent = email;
+    document.getElementById('btn-logout').addEventListener('click', async function() {
+      await window.Clerk.signOut();
+      window.location.href = '/login';
+    });
 
-  document.getElementById('btn-logout').addEventListener('click', async function() {
-    await window.Clerk.signOut();
-    window.location.href = '/login';
+    window.CFOGetUserId = () => window.Clerk.user?.id || null;
   });
-
-  window.CFOGetUserId = () => window.Clerk.user?.id || null;
-});
+  document.head.appendChild(s);
+})();
 
 // ═══════════════════════════════════════════════════════════════════
 // CFOData — global data layer with localStorage persistence

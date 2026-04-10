@@ -352,14 +352,6 @@
     .login-right { padding: 32px 24px; }
   }
 </style>
-<!-- Clerk SDK — carregamento direto com a publishable key pública -->
-<script
-  async
-  crossorigin="anonymous"
-  data-clerk-publishable-key="pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk"
-  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-  id="clerk-script"
-></script>
 </head>
 <body>
 
@@ -474,46 +466,46 @@
 </div>
 
 <script>
-  window.addEventListener('load', async function() {
-    let attempts = 0;
-    while (!window.Clerk && attempts < 50) {
-      await new Promise(r => setTimeout(r, 100));
-      attempts++;
-    }
+  (function() {
+    var CLERK_KEY = 'pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk';
+    var s = document.createElement('script');
+    s.setAttribute('data-clerk-publishable-key', CLERK_KEY);
+    s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js';
+    s.crossOrigin = 'anonymous';
+    s.addEventListener('load', async function() {
+      await window.Clerk.load();
 
-    if (!window.Clerk) {
+      if (window.Clerk.user) {
+        window.location.href = '/dashboard';
+        return;
+      }
+
+      window.Clerk.mountSignIn(document.getElementById('clerk-sign-in'), {
+        afterSignInUrl: '/dashboard',
+        appearance: {
+          variables: {
+            colorPrimary: '#1A4BBF',
+            colorBackground: '#ffffff',
+            colorText: '#08163A',
+            borderRadius: '10px',
+            fontFamily: 'Plus Jakarta Sans, sans-serif'
+          },
+          elements: {
+            card: 'box-shadow: none; padding: 0;',
+            headerTitle: 'display: none;',
+            headerSubtitle: 'display: none;',
+            socialButtonsBlockButton: 'border: 1px solid #C4CEDE;',
+            formButtonPrimary: 'background: #1A4BBF;'
+          }
+        }
+      });
+    });
+    s.addEventListener('error', function() {
       document.getElementById('clerk-sign-in').innerHTML =
         '<p style="color:#ff6b6b;text-align:center;padding:20px;">Erro ao carregar autenticação. Recarregue a página.</p>';
-      return;
-    }
-
-    await window.Clerk.load();
-
-    if (window.Clerk.user) {
-      window.location.href = '/dashboard';
-      return;
-    }
-
-    window.Clerk.mountSignIn(document.getElementById('clerk-sign-in'), {
-      afterSignInUrl: '/dashboard',
-      appearance: {
-        variables: {
-          colorPrimary: '#1A4BBF',
-          colorBackground: '#ffffff',
-          colorText: '#08163A',
-          borderRadius: '10px',
-          fontFamily: 'Plus Jakarta Sans, sans-serif'
-        },
-        elements: {
-          card: 'box-shadow: none; padding: 0;',
-          headerTitle: 'display: none;',
-          headerSubtitle: 'display: none;',
-          socialButtonsBlockButton: 'border: 1px solid #C4CEDE;',
-          formButtonPrimary: 'background: #1A4BBF;'
-        }
-      }
     });
-  });
+    document.head.appendChild(s);
+  })();
 </script>
 </body>
 </html>
