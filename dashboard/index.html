@@ -403,6 +403,12 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
   .chart-row.cols-2, .chart-row.cols-3 { grid-template-columns: 1fr; }
   .export-grid { grid-template-columns: 1fr; }
 }
+/* ── EMPTY STATE ── */
+.empty-note {
+  text-align: center; padding: 32px 16px;
+  color: var(--g500); font-size: 13px; line-height: 1.6;
+}
+.empty-note strong { color: rgba(255,255,255,0.5); display: block; margin-bottom: 6px; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -416,7 +422,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
     </div>
     <div class="sidebar-logo-text">
       <span class="brand">CFO Agent</span>
-      <span class="sub">Financial Intel</span>
+      <span class="sub">Financial Intelligence</span>
     </div>
   </a>
   <nav class="sidebar-nav">
@@ -496,11 +502,6 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
     </div>
     <div class="topbar-right">
       <select class="month-select" id="monthSelect" onchange="updateMonth()">
-        <option value="Dez/25">Dez/25</option>
-        <option value="Jan/26">Jan/26</option>
-        <option value="Fev/26" selected>Fev/26</option>
-        <option value="Mar/26">Mar/26</option>
-        <option value="Abr/26">Abr/26</option>
       </select>
       <button class="topbar-btn" onclick="showView('relatorios', null)">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -522,50 +523,50 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-label">Faturamento Total</div>
-          <div class="kpi-value">R$ 357,5K</div>
-          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> -9,5% vs Jan/26</div>
+          <div class="kpi-value" id="kpi-fat">R$ 0</div>
+          <div class="kpi-delta neu" id="kpi-fat-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Lucro Líquido</div>
-          <div class="kpi-value" style="color:var(--red)">R$ -8,6K</div>
-          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> -122,4% vs Jan/26</div>
+          <div class="kpi-value" id="kpi-lucro">R$ 0</div>
+          <div class="kpi-delta neu" id="kpi-lucro-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Margem de Lucro</div>
-          <div class="kpi-value" style="color:var(--red)">-2,4%</div>
-          <div class="kpi-delta neg">Abaixo da meta (5%)</div>
+          <div class="kpi-value" id="kpi-margem">—</div>
+          <div class="kpi-delta neu" id="kpi-margem-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Saldo Consolidado</div>
-          <div class="kpi-value">R$ 85,1K</div>
-          <div class="kpi-delta neu">5 instituições</div>
+          <div class="kpi-value" id="kpi-saldo">R$ 0</div>
+          <div class="kpi-delta neu" id="kpi-saldo-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Total de Custos</div>
-          <div class="kpi-value">R$ 366,1K</div>
-          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> +5,2% vs Jan/26</div>
+          <div class="kpi-value" id="kpi-custos">R$ 0</div>
+          <div class="kpi-delta neu" id="kpi-custos-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Ticket Médio</div>
-          <div class="kpi-value">R$ 4,2K</div>
-          <div class="kpi-delta pos"><svg viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15"/></svg> +3,1% vs Jan/26</div>
+          <div class="kpi-value" id="kpi-ticket">—</div>
+          <div class="kpi-delta neu" id="kpi-ticket-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Entradas (Fev/26)</div>
-          <div class="kpi-value" style="color:var(--green)">R$ 394K</div>
-          <div class="kpi-delta pos"><svg viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15"/></svg> +8,3% vs Jan</div>
+          <div class="kpi-label">Entradas</div>
+          <div class="kpi-value" id="kpi-entradas" style="color:var(--green)">R$ 0</div>
+          <div class="kpi-delta neu" id="kpi-entradas-delta">Sem dados</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Saídas (Fev/26)</div>
-          <div class="kpi-value" style="color:var(--red)">R$ 402,6K</div>
-          <div class="kpi-delta neg"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg> +12,1% vs Jan</div>
+          <div class="kpi-label">Saídas</div>
+          <div class="kpi-value" id="kpi-saidas" style="color:var(--red)">R$ 0</div>
+          <div class="kpi-delta neu" id="kpi-saidas-delta">Sem dados</div>
         </div>
       </div>
       <div class="chart-row cols-2">
         <div class="chart-card">
           <div class="chart-header">
             <div>
-              <div class="chart-title">Evolução Financeira — Dez/25 a Mar/26</div>
+              <div class="chart-title">Evolução Financeira</div>
               <div class="chart-sub">Faturamento · Custos · Lucro Líquido</div>
             </div>
             <div class="chart-legend">
@@ -591,18 +592,10 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
           <div class="chart-header">
             <div class="chart-title">Alertas Ativos</div>
           </div>
-          <div class="alerts-list">
-            <div class="alert-item critical">
-              <div class="alert-icon critical"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-              <div><div class="alert-title">Margem negativa em Fev/26</div><div class="alert-desc">Lucro líquido de -R$ 8.600 representa margem de -2,4%. Custos superaram o faturamento pelo 2º mês consecutivo.</div><div class="alert-time">Gerado em 01/03/2026</div></div>
-            </div>
-            <div class="alert-item warning">
-              <div class="alert-icon warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-              <div><div class="alert-title">Custo de Insumos acima da meta</div><div class="alert-desc">R$ 41.000 em Fev/26 vs meta de R$ 35.000. Variação de +17,1%. Verificar renegociação com fornecedores.</div><div class="alert-time">Gerado em 01/03/2026</div></div>
-            </div>
+          <div class="alerts-list" id="alertas-visao-geral">
             <div class="alert-item info">
               <div class="alert-icon info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-              <div><div class="alert-title">Tendência de queda no faturamento</div><div class="alert-desc">Fev/26 apresentou queda de 9,5% vs Jan/26. Acompanhar março para confirmar tendência.</div><div class="alert-time">Gerado em 28/02/2026</div></div>
+              <div><div class="alert-title">Nenhum alerta ativo</div><div class="alert-desc">Adicione dados financeiros em "Entrada de Dados" para que o sistema gere alertas automáticos.</div></div>
             </div>
           </div>
         </div>
@@ -616,7 +609,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="chart-row cols-1">
         <div class="chart-card">
           <div class="chart-header">
-            <div><div class="chart-title">Faturamento vs Custos vs Lucro — Dez/25 a Mar/26</div><div class="chart-sub">Comparativo mensal com barras agrupadas</div></div>
+            <div><div class="chart-title">Faturamento vs Custos vs Lucro</div><div class="chart-sub">Comparativo mensal com barras agrupadas</div></div>
             <div class="chart-legend">
               <div class="legend-item"><div class="legend-dot" style="background:#2D63E0"></div>Faturamento</div>
               <div class="legend-item"><div class="legend-dot" style="background:#FF5F57"></div>Custos</div>
@@ -629,7 +622,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="chart-row cols-2">
         <div class="chart-card">
           <div class="chart-header">
-            <div><div class="chart-title">Evolução do Saldo por Banco</div><div class="chart-sub">Área empilhada — Dez/25 a Mar/26</div></div>
+            <div><div class="chart-title">Evolução do Saldo por Banco</div><div class="chart-sub">Área empilhada por período</div></div>
           </div>
           <div class="chart-wrap"><canvas id="chartSaldoBanco"></canvas></div>
         </div>
@@ -649,7 +642,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="chart-row cols-2">
         <div class="chart-card">
           <div class="chart-header">
-            <div><div class="chart-title">Top 10 Categorias de Custo</div><div class="chart-sub">Fevereiro 2026 — R$ 366,1K total</div></div>
+            <div><div class="chart-title">Top 10 Categorias de Custo</div><div class="chart-sub">Período atual</div></div>
           </div>
           <div class="chart-wrap"><canvas id="chartCustoDonut" style="max-height:280px"></canvas></div>
         </div>
@@ -663,7 +656,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="chart-card">
         <div class="chart-header"><div class="chart-title">Detalhamento de Custos — Fevereiro 2026</div></div>
         <table class="data-table">
-          <thead><tr><th>Categoria</th><th>Fev/26 (R$)</th><th>Jan/26 (R$)</th><th>Variação</th><th>% do Total</th></tr></thead>
+          <thead><tr><th>Categoria</th><th>Período Atual (R$)</th><th>Período Anterior (R$)</th><th>Variação</th><th>% do Total</th></tr></thead>
           <tbody id="tbCustos"></tbody>
         </table>
       </div>
@@ -676,40 +669,36 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="kpi-card">
           <div class="kpi-label">Total Entradas</div>
-          <div class="kpi-value" style="color:var(--green)">R$ 394,0K</div>
-          <div class="kpi-delta pos">Fevereiro 2026</div>
+          <div class="kpi-value" id="fluxo-entradas" style="color:var(--green)">R$ 0</div>
+          <div class="kpi-delta neu" id="fluxo-entradas-sub">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Total Saídas</div>
-          <div class="kpi-value" style="color:var(--red)">R$ 402,6K</div>
-          <div class="kpi-delta neg">Fevereiro 2026</div>
+          <div class="kpi-value" id="fluxo-saidas" style="color:var(--red)">R$ 0</div>
+          <div class="kpi-delta neu" id="fluxo-saidas-sub">Sem dados</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Saldo do Período</div>
-          <div class="kpi-value" style="color:var(--red)">R$ -8,6K</div>
-          <div class="kpi-delta neg">Consumo de caixa</div>
+          <div class="kpi-value" id="fluxo-saldo">R$ 0</div>
+          <div class="kpi-delta neu" id="fluxo-saldo-sub">Sem dados</div>
         </div>
       </div>
       <div class="chart-row cols-2">
         <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">Entradas vs Saídas — Mensal</div><div class="chart-sub">Dez/25 a Mar/26</div></div></div>
+          <div class="chart-header"><div><div class="chart-title">Entradas vs Saídas — Mensal</div><div class="chart-sub">Histórico mensal</div></div></div>
           <div class="chart-wrap"><canvas id="chartFluxo"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">Distribuição por Instituição</div><div class="chart-sub">Saídas em Fev/26</div></div></div>
+          <div class="chart-header"><div><div class="chart-title">Distribuição por Instituição</div><div class="chart-sub">Distribuição por instituição</div></div></div>
           <div class="chart-wrap"><canvas id="chartBancosPie"></canvas></div>
         </div>
       </div>
       <div class="chart-card">
-        <div class="chart-header"><div class="chart-title">Entradas e Saídas por Banco — Fev/26</div></div>
+        <div class="chart-header"><div class="chart-title">Entradas e Saídas por Banco</div></div>
         <table class="data-table">
           <thead><tr><th>Instituição</th><th>Entradas (R$)</th><th>Saídas (R$)</th><th>Saldo (R$)</th><th>% das Saídas</th></tr></thead>
           <tbody>
-            <tr><td>Unicred Geral</td><td style="color:var(--green)">R$ 0</td><td style="color:var(--red)">R$ 248.300</td><td style="color:var(--red)">-R$ 248.300</td><td><span class="badge neg">61,7%</span></td></tr>
-            <tr><td>Asaas</td><td style="color:var(--green)">R$ 319.500</td><td style="color:var(--red)">R$ 13.000</td><td style="color:var(--green)">+R$ 306.500</td><td><span class="badge pos">3,2%</span></td></tr>
-            <tr><td>Infinity Pay</td><td style="color:var(--green)">R$ 38.000</td><td style="color:var(--red)">R$ 69.000</td><td style="color:var(--red)">-R$ 31.000</td><td><span class="badge neg">17,1%</span></td></tr>
-            <tr><td>Finpet</td><td style="color:var(--green)">R$ 36.500</td><td style="color:var(--red)">R$ 41.000</td><td style="color:var(--red)">-R$ 4.500</td><td><span class="badge neg">10,2%</span></td></tr>
-            <tr><td>Dinheiro em Espécie</td><td style="color:var(--green)">R$ 0</td><td style="color:var(--red)">R$ 2.800</td><td style="color:var(--red)">-R$ 2.800</td><td><span class="badge neg">0,7%</span></td></tr>
+            <tr><td colspan="5" style="text-align:center;color:var(--g500);padding:20px">Adicione dados em "Entrada de Dados" para visualizar esta análise.</td></tr>
           </tbody>
         </table>
       </div>
@@ -727,7 +716,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       </div>
       <div class="chart-card">
         <table class="data-table">
-          <thead><tr><th>#</th><th>Categoria</th><th>Valor Fev/26</th><th>Valor Jan/26</th><th>Variação R$</th><th>Variação %</th><th>% do Total</th></tr></thead>
+          <thead><tr><th>#</th><th>Categoria</th><th>Período Atual</th><th>Período Anterior</th><th>Variação R$</th><th>Variação %</th><th>% do Total</th></tr></thead>
           <tbody id="tbCustosDetalhado"></tbody>
         </table>
       </div>
@@ -740,18 +729,11 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
       <div class="filters">
         <span class="filter-label">Mês:</span>
         <select class="filter-select" id="filterMes" onchange="filterTransacoes()">
-          <option value="">Todos</option>
-          <option value="Jan" selected>Jan/26</option>
-          <option value="Fev">Fev/26</option>
+          <option value="">Todos os meses</option>
         </select>
         <span class="filter-label">Banco:</span>
         <select class="filter-select" id="filterBanco" onchange="filterTransacoes()">
-          <option value="">Todos</option>
-          <option>Unicred Geral</option>
-          <option>Asaas</option>
-          <option>Infinity Pay</option>
-          <option>Finpet</option>
-          <option>Dinheiro em Espécie</option>
+          <option value="">Todos os bancos</option>
         </select>
         <span class="filter-label">Tipo:</span>
         <select class="filter-select" id="filterTipo" onchange="filterTransacoes()">
@@ -1187,38 +1169,7 @@ const CUSTOS_CATS = [
   {cat:'Outros Custos',            jan:3000,  fev:2800},
 ];
 
-const TRANSACOES = [
-  {data:'03/01/2026',desc:'Recebimento Cliente A',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:95000},
-  {data:'05/01/2026',desc:'Pagamento Folha Jan',cat:'Salários',tipo:'Saída',banco:'Unicred Geral',valor:85000},
-  {data:'07/01/2026',desc:'Compra Insumos Lote 1',cat:'Insumos',tipo:'Saída',banco:'Unicred Geral',valor:18500},
-  {data:'08/01/2026',desc:'Recebimento Cliente B',cat:'Faturamento',tipo:'Entrada',banco:'Infinity Pay',valor:42000},
-  {data:'10/01/2026',desc:'Aluguel Imóvel Jan',cat:'Imóvel',tipo:'Saída',banco:'Unicred Geral',valor:12000},
-  {data:'12/01/2026',desc:'Parcela Financiamento',cat:'Financiamento',tipo:'Saída',banco:'Unicred Geral',valor:18000},
-  {data:'14/01/2026',desc:'Serviços Contabilidade',cat:'Prof. Externos',tipo:'Saída',banco:'Asaas',valor:4500},
-  {data:'15/01/2026',desc:'DARF Simples Nacional',cat:'Impostos',tipo:'Saída',banco:'Unicred Geral',valor:28000},
-  {data:'16/01/2026',desc:'Recebimento Cliente C',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:58000},
-  {data:'18/01/2026',desc:'Google Ads Jan',cat:'Marketing',tipo:'Saída',banco:'Infinity Pay',valor:4500},
-  {data:'20/01/2026',desc:'Tarifa Bancária',cat:'Desp. Financeiras',tipo:'Saída',banco:'Unicred Geral',valor:1200},
-  {data:'22/01/2026',desc:'Compra Insumos Lote 2',cat:'Insumos',tipo:'Saída',banco:'Finpet',valor:19500},
-  {data:'24/01/2026',desc:'Recebimento Cliente D',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:75000},
-  {data:'25/01/2026',desc:'FGTS Jan',cat:'Impostos/Salários',tipo:'Saída',banco:'Unicred Geral',valor:8500},
-  {data:'28/01/2026',desc:'Licença Software ERP',cat:'TI + Telecom',tipo:'Saída',banco:'Infinity Pay',valor:3200},
-  {data:'29/01/2026',desc:'Combustível Veículos Jan',cat:'Veículos',tipo:'Saída',banco:'Dinheiro em Espécie',valor:2800},
-  {data:'30/01/2026',desc:'Recebimento Cliente E',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:125000},
-  {data:'03/02/2026',desc:'Recebimento Cliente A Fev',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:92000},
-  {data:'05/02/2026',desc:'Pagamento Folha Fev',cat:'Salários',tipo:'Saída',banco:'Unicred Geral',valor:88000},
-  {data:'07/02/2026',desc:'Laboratório Externo',cat:'Laboratórios',tipo:'Saída',banco:'Unicred Geral',valor:9500},
-  {data:'09/02/2026',desc:'Recebimento Cliente B Fev',cat:'Faturamento',tipo:'Entrada',banco:'Infinity Pay',valor:38000},
-  {data:'10/02/2026',desc:'Aluguel Imóvel Fev',cat:'Imóvel',tipo:'Saída',banco:'Unicred Geral',valor:12000},
-  {data:'12/02/2026',desc:'Parcela Financiamento Fev',cat:'Financiamento',tipo:'Saída',banco:'Unicred Geral',valor:18000},
-  {data:'14/02/2026',desc:'Instagram Ads Fev',cat:'Marketing',tipo:'Saída',banco:'Infinity Pay',valor:5000},
-  {data:'15/02/2026',desc:'DARF Simples Nacional Fev',cat:'Impostos',tipo:'Saída',banco:'Unicred Geral',valor:25500},
-  {data:'18/02/2026',desc:'Recebimento Cliente F',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:44000},
-  {data:'20/02/2026',desc:'Equipe Técnica Fev',cat:'Equipe Técnica',tipo:'Saída',banco:'Unicred Geral',valor:47000},
-  {data:'22/02/2026',desc:'Compra Insumos Fev',cat:'Insumos',tipo:'Saída',banco:'Finpet',valor:41000},
-  {data:'25/02/2026',desc:'FGTS Fev',cat:'Impostos/Salários',tipo:'Saída',banco:'Unicred Geral',valor:8800},
-  {data:'28/02/2026',desc:'Recebimento Cliente G',cat:'Faturamento',tipo:'Entrada',banco:'Asaas',valor:83500},
-];
+let TRANSACOES = [];
 
 // ── HELPERS ──────────────────────────────────────────────────────
 const fmt = v => v == null ? '—' : 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
@@ -1501,6 +1452,12 @@ function renderTransacoes() {
   const pages = Math.ceil(total / PAGE_SIZE);
   const slice = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
 
+  if (filtered.length === 0) {
+    document.getElementById('tbTransacoes').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;color:var(--g500);padding:24px">Nenhuma transação encontrada. Acesse "Entrada de Dados" para adicionar dados.</td></tr>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
   let html = '';
   slice.forEach(t => {
     const color = t.tipo === 'Entrada' ? 'var(--green)' : 'var(--red)';
@@ -1544,6 +1501,30 @@ function changePage(p) {
   renderTransacoes();
 }
 
+function populateTransacoesFilters() {
+  const meses = [...new Set(TRANSACOES.map(t => {
+    const p = t.data.split('/');
+    return (p[1]||'') + '/' + (p[2]||'').slice(-2);
+  }))].filter(Boolean).sort();
+  const bancos = [...new Set(TRANSACOES.map(t => t.banco))].filter(Boolean).sort();
+  const selMes = document.getElementById('filterMes');
+  if (selMes) {
+    meses.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = m;
+      selMes.appendChild(opt);
+    });
+  }
+  const selBanco = document.getElementById('filterBanco');
+  if (selBanco) {
+    bancos.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b; opt.textContent = b;
+      selBanco.appendChild(opt);
+    });
+  }
+}
+
 // ── NAVIGATION ───────────────────────────────────────────────────
 const PAGE_TITLES = {
   'visao-geral':'Visão Geral','evolucao':'Evolução Temporal','custos':'Breakdown de Custos',
@@ -1561,6 +1542,7 @@ function showView(id, el) {
   if (el) el.classList.add('active');
   document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
   if (id === 'transacoes') renderTransacoes();
+  if (id === 'entrada-dados') { setTimeout(() => edLoad('fat'), 0); }
 }
 
 // ── CHAT ─────────────────────────────────────────────────────────
@@ -1645,17 +1627,35 @@ function exportCSV(type) {
   a.click(); URL.revokeObjectURL(a.href);
 }
 
+function populateMonthSelect() {
+  const sel = document.getElementById('monthSelect');
+  if (!sel) return;
+  const names = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const now = new Date();
+  for (let i = -5; i <= 2; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const label = names[d.getMonth()] + '/' + String(d.getFullYear()).slice(-2);
+    const opt = document.createElement('option');
+    opt.value = label; opt.textContent = label;
+    if (i === 0) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
 function updateMonth() {
-  const m = document.getElementById('monthSelect').value;
-  console.log('Month changed to:', m);
+  // future: re-filter charts by selected month
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  populateMonthSelect();
+  const storedTxn = CFOData.getTransacoes();
+  if (storedTxn && storedTxn.length) TRANSACOES = storedTxn;
   initCharts();
   buildCustosTable();
   buildCustosDetalhadoTable();
   renderTransacoes();
+  populateTransacoesFilters();
 });
 
 (function() {
@@ -1736,7 +1736,21 @@ const CFOData = {
 // ENTRADA DE DADOS — constants
 // ═══════════════════════════════════════════════════════════════════
 const ED_MONTHS = ['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26','Jun/26','Jul/26','Ago/26','Set/26','Out/26','Nov/26','Dez/26','Jan/27'];
-const ED_BANCOS = ['Unicred Geral','Infinity Pay','Asaas','Finpet','Dinheiro em Espécie','Outra'];
+const ED_BANCOS = [
+  'Banco do Brasil','Bradesco','Caixa Econômica Federal','Itaú',
+  'Santander','BTG Pactual','Safra','BV (Banco Votorantim)',
+  'Banrisul','Sicoob','Sicredi','Unicred','ABC Brasil',
+  'Daycoval','Rendimento','Sofisa','Modal','BMG','Pine',
+  'Nubank','Inter','C6 Bank','Next','Neon','Original',
+  'PicPay','PagBank','Mercado Pago','XP Investimentos',
+  'Rico','Toro','Warren','Órama',
+  'Stone','Cielo','Rede','GetNet','SumUp','Ton',
+  'Asaas','Efí (Gerencianet)','Iugu','Juno','Stripe',
+  'PayPal','Adyen','Infinity Pay','Finpet',
+  'Ame Digital','RecargaPay','Amazon Pay',
+  'Dinheiro em espécie',
+  'Outro'
+];
 const ED_CAT_FAT = ['Consultas','Procedimentos','Produtos','Outros'];
 const ED_CAT_CUS = [
   'Equipe Técnica','Salários + VT + VR + VA','Despesas com Diretoria','Insumos',
@@ -1752,6 +1766,11 @@ function edMesOpts(selected) {
 }
 function edBancoOpts(selected) {
   return ED_BANCOS.map(b => `<option value="${b}" ${b===selected?'selected':''}>${b}</option>`).join('');
+}
+function edBancoCell(selected) {
+  const uid = 'bl' + Math.random().toString(36).slice(2,8);
+  const opts = ED_BANCOS.map(b => `<option value="${b}">`).join('');
+  return `<input class="ed-input" type="text" list="${uid}" value="${selected||''}" placeholder="Selecione ou digite..." style="min-width:155px"><datalist id="${uid}">${opts}</datalist>`;
 }
 function edCatFatOpts(selected) {
   return ED_CAT_FAT.map(c => `<option value="${c}" ${c===selected?'selected':''}>${c}</option>`).join('');
@@ -1811,7 +1830,7 @@ function edRenderSalRow(r) {
   r = r || {};
   return `<tr>
     <td>${edSelect(edMesOpts(r.mes||''))}</td>
-    <td>${edSelect(edBancoOpts(r.banco||''))}</td>
+    <td>${edBancoCell(r.banco||'')}</td>
     <td>${edInput('number', r.saldoIni||'', 'placeholder="0,00" step="0.01"')}</td>
     <td>${edInput('number', r.saldoFin||'', 'placeholder="0,00" step="0.01"')}</td>
     <td>${edDelBtn()}</td>
@@ -1825,7 +1844,7 @@ function edRenderTxnRow(r) {
   return `<tr>
     <td>${edInput('date', r.data||'', 'onchange="edUpdateMes(this)"')}</td>
     <td><input class="ed-input" type="text" value="${r.mes||''}" placeholder="Auto" readonly style="opacity:0.5;cursor:default;width:72px"></td>
-    <td>${edSelect(edBancoOpts(r.banco||''))}</td>
+    <td>${edBancoCell(r.banco||'')}</td>
     <td>${edInput('text', r.desc||'', 'placeholder="Descrição"')}</td>
     <td>${edSelect(edTipoOpts(tipo), `onchange="edColorVal(this)"`)}</td>
     <td><input class="ed-input ${valClass}" type="number" value="${r.valor||''}" placeholder="0,00" min="0" step="0.01" data-valcell="1"></td>
@@ -2090,12 +2109,7 @@ function showToast(msg, isError) {
   _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ── init Entrada de Dados when view becomes active ─────────────────
-const _origShowView = showView;
-function showView(id, el) {
-  _origShowView(id, el);
-  if (id === 'entrada-dados') edLoad('fat');
-}
+// Navigation handled in showView above
 </script>
 </body>
 </html>
