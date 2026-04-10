@@ -8,9 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="/js/config.js"></script>
-<script src="/js/auth.js"></script>
 <script src="/js/db.js"></script>
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk"
+  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -1653,26 +1657,42 @@ function updateMonth() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  await CFOAuth.init();
-  CFOAuth.requireAuth();
-
-  const user = CFOAuth.getUser();
-  if (user) {
-    const email = CFOAuth.getEmail();
-    const name = user.firstName || email.split('@')[0] || 'Usuário';
-    const initial = name.charAt(0).toUpperCase();
-    document.getElementById('user-avatar').textContent = initial;
-    document.getElementById('user-name').textContent = name;
-    document.getElementById('user-email').textContent = email;
-  }
-
-  document.getElementById('btn-logout').addEventListener('click', () => CFOAuth.signOut());
-
+document.addEventListener('DOMContentLoaded', () => {
   initCharts();
   buildCustosTable();
   buildCustosDetalhadoTable();
   renderTransacoes();
+});
+
+window.addEventListener('load', async function() {
+  let attempts = 0;
+  while (!window.Clerk && attempts < 50) {
+    await new Promise(r => setTimeout(r, 100));
+    attempts++;
+  }
+  if (!window.Clerk) return;
+
+  await window.Clerk.load();
+
+  if (!window.Clerk.user) {
+    window.location.href = '/login';
+    return;
+  }
+
+  const user = window.Clerk.user;
+  const email = user.primaryEmailAddress?.emailAddress || '';
+  const name = user.firstName || email.split('@')[0] || 'Usuário';
+  const initial = name.charAt(0).toUpperCase();
+  document.getElementById('user-avatar').textContent = initial;
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-email').textContent = email;
+
+  document.getElementById('btn-logout').addEventListener('click', async function() {
+    await window.Clerk.signOut();
+    window.location.href = '/login';
+  });
+
+  window.CFOGetUserId = () => window.Clerk.user?.id || null;
 });
 
 // ═══════════════════════════════════════════════════════════════════

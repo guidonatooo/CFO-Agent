@@ -15,25 +15,32 @@ window.CFODb = {
     }
   },
 
+  _userId() {
+    return window.CFOGetUserId ? window.CFOGetUserId() : null;
+  },
+
   async select(tabela, userId) {
+    const uid = userId || this._userId();
     return this.query(
       `SELECT * FROM ${tabela} WHERE user_id = $1 ORDER BY created_at DESC`,
-      [userId], userId
+      [uid], uid
     );
   },
 
   async insert(tabela, campos, valores, userId) {
+    const uid = userId || this._userId();
     const placeholders = valores.map((_, i) => `$${i + 1}`).join(', ');
     return this.query(
       `INSERT INTO ${tabela} (user_id, ${campos.join(', ')}) VALUES ($${valores.length + 1}, ${placeholders}) RETURNING id`,
-      [...valores, userId], userId
+      [...valores, uid], uid
     );
   },
 
   async deleteById(tabela, id, userId) {
+    const uid = userId || this._userId();
     return this.query(
       `DELETE FROM ${tabela} WHERE id = $1 AND user_id = $2`,
-      [id, userId], userId
+      [id, uid], uid
     );
   }
 };
