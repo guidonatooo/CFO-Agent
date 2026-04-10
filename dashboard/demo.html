@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CFO Agent — Dashboard</title>
+<title>CFO Agent — Demonstração</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -25,7 +25,7 @@
 html, body { height: 100%; font-family: var(--font-b); background: var(--dark); color: var(--white); overflow: hidden; }
 
 /* ── LAYOUT ── */
-.app { display: flex; height: 100vh; overflow: hidden; }
+.app { display: flex; height: calc(100vh - 36px); overflow: hidden; }
 
 /* ── SIDEBAR ── */
 .sidebar {
@@ -445,7 +445,11 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
 .btn-cfg-add:hover { background: rgba(26,75,191,0.5); }
 </style>
 </head>
-<body>
+<body style="padding-top:36px">
+<div id="demo-banner" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#C9971C,#F0C040);color:#08163A;text-align:center;font-size:13px;font-weight:700;padding:8px;letter-spacing:0.06em;">
+  MODO DEMONSTRAÇÃO — Dados fictícios para fins ilustrativos
+  <a href="/login" style="margin-left:20px;color:#08163A;font-weight:800;text-decoration:underline;">→ Quero acesso real</a>
+</div>
 <div class="app">
 
 <!-- ── SIDEBAR ── -->
@@ -515,17 +519,13 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
     </a>
   </nav>
   <div class="sidebar-footer">
-    <div class="sidebar-user">
-      <div class="user-avatar" id="user-avatar">G</div>
-      <div>
-        <div class="user-name" id="user-name">—</div>
-        <div class="user-role" id="user-email" style="font-size:10px;color:rgba(255,255,255,0.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;">—</div>
-      </div>
+    <div style="padding:8px 10px;">
+      <div style="padding:8px 12px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);border-radius:6px;font-size:11px;font-weight:700;color:#F0C040;text-align:center;letter-spacing:0.08em;">MODO DEMO — Dados fictícios</div>
+      <a href="/login" style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;text-decoration:none;background:rgba(26,75,191,0.15);border:1px solid rgba(26,75,191,0.3);">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Acessar com conta real
+      </a>
     </div>
-    <button class="btn-logout" id="btn-logout">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sair
-    </button>
   </div>
 </aside>
 
@@ -1911,6 +1911,50 @@ function updateMonth() {
 
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // ── DEMO MODE: inject sample data into localStorage ──────────────────
+  const DEMO_FAT = [
+    {mes:'Dez/25', desc:'Serviços', valor:78000, cat:'Serviço'},
+    {mes:'Jan/26', desc:'Serviços', valor:91000, cat:'Serviço'},
+    {mes:'Jan/26', desc:'Consultoria', valor:28000, cat:'Consultoria'},
+    {mes:'Fev/26', desc:'Serviços', valor:85000, cat:'Serviço'},
+    {mes:'Fev/26', desc:'Produtos', valor:32000, cat:'Produto'},
+  ];
+  const DEMO_CUS = [
+    {mes:'Dez/25', cat:'Pessoal', desc:'Folha', valor:40000},
+    {mes:'Dez/25', cat:'Fornecedores', desc:'Materiais', valor:15000},
+    {mes:'Dez/25', cat:'Infraestrutura', desc:'Aluguel', valor:8000},
+    {mes:'Jan/26', cat:'Pessoal', desc:'Folha', valor:44000},
+    {mes:'Jan/26', cat:'Fornecedores', desc:'Materiais', valor:16500},
+    {mes:'Jan/26', cat:'Marketing', desc:'Digital', valor:4800},
+    {mes:'Fev/26', cat:'Pessoal', desc:'Folha', valor:45000},
+    {mes:'Fev/26', cat:'Fornecedores', desc:'Materiais', valor:18000},
+    {mes:'Fev/26', cat:'Infraestrutura', desc:'Aluguel', valor:8500},
+    {mes:'Fev/26', cat:'Marketing', desc:'Digital', valor:5200},
+  ];
+  const DEMO_SAL = [
+    {mes:'Jan/26', banco:'Nubank', saldoIni:24000, saldoFin:28000},
+    {mes:'Jan/26', banco:'Itaú', saldoIni:48000, saldoFin:45000},
+    {mes:'Fev/26', banco:'Nubank', saldoIni:28000, saldoFin:31400},
+    {mes:'Fev/26', banco:'Itaú', saldoIni:45000, saldoFin:42800},
+  ];
+  const DEMO_TXN = [
+    {data:'03/01/2026', mes:'Jan/26', banco:'Nubank', desc:'Recebimento Serviços Jan', tipo:'Crédito', valor:91000, cat:'Receita'},
+    {data:'05/01/2026', mes:'Jan/26', banco:'Itaú', desc:'Pagamento Folha Jan', tipo:'Débito', valor:44000, cat:'Pessoal'},
+    {data:'10/01/2026', mes:'Jan/26', banco:'Itaú', desc:'Aluguel Jan', tipo:'Débito', valor:8500, cat:'Infraestrutura'},
+    {data:'15/01/2026', mes:'Jan/26', banco:'Itaú', desc:'Materiais Jan', tipo:'Débito', valor:16500, cat:'Fornecedores'},
+    {data:'20/01/2026', mes:'Jan/26', banco:'Nubank', desc:'Google Ads Jan', tipo:'Débito', valor:4800, cat:'Marketing'},
+    {data:'03/02/2026', mes:'Fev/26', banco:'Nubank', desc:'Recebimento Serviços Fev', tipo:'Crédito', valor:85000, cat:'Receita'},
+    {data:'05/02/2026', mes:'Fev/26', banco:'Itaú', desc:'Pagamento Folha Fev', tipo:'Débito', valor:45000, cat:'Pessoal'},
+    {data:'07/02/2026', mes:'Fev/26', banco:'Nubank', desc:'Produtos Fev', tipo:'Crédito', valor:32000, cat:'Receita'},
+    {data:'10/02/2026', mes:'Fev/26', banco:'Itaú', desc:'Aluguel Fev', tipo:'Débito', valor:8500, cat:'Infraestrutura'},
+    {data:'15/02/2026', mes:'Fev/26', banco:'Itaú', desc:'Materiais Fev', tipo:'Débito', valor:18000, cat:'Fornecedores'},
+  ];
+  localStorage.setItem('cfo_faturamento', JSON.stringify(DEMO_FAT));
+  localStorage.setItem('cfo_custos', JSON.stringify(DEMO_CUS));
+  localStorage.setItem('cfo_saldos', JSON.stringify(DEMO_SAL));
+  localStorage.setItem('cfo_transacoes', JSON.stringify(DEMO_TXN));
+  // ── END DEMO DATA ───────────────────────────────────────────
+
   populateMonthSelect();
 
   // Load transactions
@@ -1970,8 +2014,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Run onboarding check (will be defined later, safe to call)
-  if (typeof verificarOnboarding === 'function') verificarOnboarding();
+  // Demo mode: skip onboarding
 
   initCharts();
   buildCustosTable();
@@ -1981,40 +2024,6 @@ document.addEventListener('DOMContentLoaded', () => {
   carregarConfiguracoes();
 });
 
-(function() {
-  var CLERK_KEY = 'pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk';
-  var s = document.createElement('script');
-  s.setAttribute('data-clerk-publishable-key', CLERK_KEY);
-  s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js';
-  s.crossOrigin = 'anonymous';
-  s.addEventListener('load', async function() {
-    await window.Clerk.load();
-
-    if (!window.Clerk.user) {
-      window.location.href = '/login';
-      return;
-    }
-
-    const user = window.Clerk.user;
-    const email = user.primaryEmailAddress?.emailAddress || '';
-    const name = user.firstName || email.split('@')[0] || 'Usuário';
-    const initial = name.charAt(0).toUpperCase();
-    document.getElementById('user-avatar').textContent = initial;
-    document.getElementById('user-name').textContent = name;
-    document.getElementById('user-email').textContent = email;
-
-    document.getElementById('btn-logout').addEventListener('click', async function() {
-      await window.Clerk.signOut();
-      window.location.href = '/login';
-    });
-
-    // Run onboarding wizard for new users
-    verificarOnboarding();
-
-    window.CFOGetUserId = () => window.Clerk.user?.id || null;
-  });
-  document.head.appendChild(s);
-})();
 
 // ═══════════════════════════════════════════════════════════════════
 // CFOData — global data layer with localStorage persistence
