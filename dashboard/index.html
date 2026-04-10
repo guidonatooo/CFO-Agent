@@ -498,7 +498,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
     <a class="nav-item" onclick="showView('alertas', this)">
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span>Alertas</span>
-      <span class="nav-badge red">3</span>
+      <span class="nav-badge red" id="badge-alertas" style="display:none"></span>
     </a>
     <a class="nav-item" onclick="showView('assistente', this)">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
@@ -619,7 +619,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
           <div class="chart-header">
             <div>
               <div class="chart-title">Saldo por Banco</div>
-              <div class="chart-sub">Fevereiro 2026</div>
+              <div class="chart-sub">Período atual</div>
             </div>
           </div>
           <div class="chart-wrap"><canvas id="chartBancos"></canvas></div>
@@ -692,7 +692,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
         </div>
       </div>
       <div class="chart-card">
-        <div class="chart-header"><div class="chart-title">Detalhamento de Custos — Fevereiro 2026</div></div>
+        <div class="chart-header"><div class="chart-title">Detalhamento de Custos</div></div>
         <table class="data-table">
           <thead><tr><th>Categoria</th><th>Período Atual (R$)</th><th>Período Anterior (R$)</th><th>Variação</th><th>% do Total</th></tr></thead>
           <tbody id="tbCustos"></tbody>
@@ -748,9 +748,9 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
     <div class="view" id="view-tabela-custos">
       <div class="filters">
         <span class="filter-label">Período:</span>
-        <select class="filter-select"><option>Fev/26</option><option>Jan/26</option><option>Dez/25</option></select>
+        <select class="filter-select"><option>Todos os períodos</option></select>
         <span class="filter-label">Categoria:</span>
-        <select class="filter-select"><option>Todas</option><option>Equipe Técnica</option><option>Insumos</option><option>Marketing</option></select>
+        <select class="filter-select"><option>Todas as categorias</option></select>
       </div>
       <div class="chart-card">
         <table class="data-table">
@@ -1774,24 +1774,79 @@ function showView(id, el) {
 }
 
 // ── CHAT ─────────────────────────────────────────────────────────
-const AI_RESPONSES = {
-  'maior margem': 'Analisando os dados, <strong>Dezembro/2025</strong> foi o mês com maior margem: <strong>9,0%</strong> sobre faturamento de R$ 422.000. O lucro líquido foi de R$ 38.000. Em comparação, Janeiro/26 caiu para 1,0% e Fevereiro/26 entrou em território negativo (-2,4%).',
-  'maiores custos': 'Os <strong>3 maiores custos</strong> em Fev/26 são:<br><br>1. <strong>Salários + VT + VR + VA</strong> — R$ 88.000 (24% do faturamento)<br>2. <strong>Equipe Técnica</strong> — R$ 47.000 (13,2%)<br>3. <strong>Insumos</strong> — R$ 41.000 (11,5%)<br><br>Juntos representam <strong>48,7%</strong> do total de custos.',
-  'breakeven': 'Com base nos custos atuais de R$ 366.100/mês, o <strong>ponto de equilíbrio</strong> está em aproximadamente <strong>R$ 366K de faturamento</strong>.<br><br>Em Fev/26 faturamos R$ 357,5K — <strong>R$ 8.600 abaixo do break-even</strong>. Para atingir 5% de margem, precisaríamos de <strong>R$ 384K/mês</strong> mantendo custos constantes.',
-  'fluxo de caixa': 'Em <strong>Fev/26</strong>:<br>• Entradas: R$ 394.000<br>• Saídas: R$ 402.600<br>• <strong>Saldo do período: -R$ 8.600</strong><br><br>Saldo consolidado atual: R$ 85.100 distribuídos em 5 bancos. Se o déficit mensal se mantiver, o caixa se esgota em aproximadamente <strong>10 meses</strong>.',
-  'fev/26': 'Análise completa de <strong>Fevereiro/2026</strong>:<br><br>📉 Faturamento: R$ 357,5K (-9,5% vs Jan)<br>📉 Lucro: -R$ 8.600 (margem -2,4%)<br>📈 Custos: R$ 366,1K (+5,2% vs Jan)<br>🏦 Saldo: R$ 85,1K<br><br><strong>Pontos críticos:</strong> Margem negativa pelo 2º mês, queda contínua no faturamento, insumos acima da meta (+17%).',
-  'ações': 'Com base nos dados atuais, recomendo as seguintes <strong>ações prioritárias</strong>:<br><br>1. <strong>Urgente:</strong> Renegociar fornecedores de Insumos (meta: -15%)<br>2. <strong>Curto prazo:</strong> Revisar campanhas de marketing — R$ 14,5K/mês sem ROI mensurado<br>3. <strong>Médio prazo:</strong> Plano de recuperação de faturamento (+9% para Mar/26)<br>4. <strong>Atenção:</strong> Parcela de financiamento termina em Mar/26 → libera R$ 18K/mês',
-};
-
 function getAIResponse(msg) {
   const m = msg.toLowerCase();
-  if (m.includes('margem')) return AI_RESPONSES['maior margem'];
-  if (m.includes('custo')) return AI_RESPONSES['maiores custos'];
-  if (m.includes('breakeven') || m.includes('equilíbrio') || m.includes('break')) return AI_RESPONSES['breakeven'];
-  if (m.includes('fluxo') || m.includes('caixa')) return AI_RESPONSES['fluxo de caixa'];
-  if (m.includes('fev') || m.includes('fevereiro')) return AI_RESPONSES['fev/26'];
-  if (m.includes('ação') || m.includes('ações') || m.includes('recomend')) return AI_RESPONSES['ações'];
-  return 'Analisando seus dados financeiros... Com faturamento de <strong>R$ 357,5K</strong> e margem de <strong>-2,4%</strong> em Fev/26, há pontos de atenção importantes. Você pode perguntar sobre margens, custos, fluxo de caixa, projeções ou ações recomendadas.';
+  const rawFat = CFOData.getFaturamento() || [];
+  const rawCus = CFOData.getCustos() || [];
+  const rawSal = CFOData.getSaldos() || [];
+  const rawTxn = CFOData.getTransacoes() || [];
+  const semDados = !rawFat.length && !rawCus.length;
+  const fmtK = v => v >= 1000000 ? 'R$ ' + (v/1000000).toFixed(1) + 'M' : v >= 1000 ? 'R$ ' + (v/1000).toFixed(0) + 'K' : 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+
+  if (semDados) return 'Ainda não há dados financeiros cadastrados. Acesse <strong>Entrada de Dados</strong> na barra lateral para inserir faturamento, custos e transações.';
+
+  const totalFat = rawFat.reduce((s,r) => s + parseFloat(r.valor||0), 0);
+  const totalCus = rawCus.reduce((s,r) => s + parseFloat(r.valor||0), 0);
+  const lucro = totalFat - totalCus;
+  const margem = totalFat > 0 ? (lucro/totalFat*100) : 0;
+  const saldo = rawSal.reduce((s,r) => s + parseFloat(r.saldoFin||r.saldo_final||0), 0);
+  const entradas = rawTxn.filter(r=>r.tipo==='Crédito').reduce((s,r)=>s+parseFloat(r.valor||0),0);
+  const saidas = rawTxn.filter(r=>r.tipo==='Débito').reduce((s,r)=>s+parseFloat(r.valor||0),0);
+
+  // Mês com maior margem
+  if (m.includes('margem') || m.includes('maior margem')) {
+    const mesFat = {};
+    rawFat.forEach(r => { if (r.mes) mesFat[r.mes] = (mesFat[r.mes]||0) + parseFloat(r.valor||0); });
+    const mesCus = {};
+    rawCus.forEach(r => { if (r.mes) mesCus[r.mes] = (mesCus[r.mes]||0) + parseFloat(r.valor||0); });
+    let bestMes = '', bestMargem = -Infinity;
+    Object.keys(mesFat).forEach(m => {
+      const f = mesFat[m], c = mesCus[m]||0;
+      const mg = f > 0 ? ((f-c)/f*100) : -Infinity;
+      if (mg > bestMargem) { bestMargem = mg; bestMes = m; }
+    });
+    return bestMes
+      ? `Analisando seus dados, <strong>${bestMes}</strong> foi o mês com maior margem: <strong>${bestMargem.toFixed(1)}%</strong> sobre faturamento de ${fmtK(mesFat[bestMes]||0)}. Margem total do período: <strong>${margem.toFixed(1)}%</strong>.`
+      : `Margem líquida total do período: <strong>${margem.toFixed(1)}%</strong> sobre ${fmtK(totalFat)} faturados. Lucro: ${fmtK(lucro)}.`;
+  }
+
+  // Maiores custos
+  if (m.includes('custo')) {
+    const porCat = {};
+    rawCus.forEach(r => { const c = r.cat||r.categoria||'Outros'; porCat[c] = (porCat[c]||0) + parseFloat(r.valor||0); });
+    const top3 = Object.entries(porCat).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    if (!top3.length) return 'Nenhum custo cadastrado ainda. Adicione em Entrada de Dados.';
+    return 'Os <strong>' + Math.min(top3.length,3) + ' maiores custos</strong> do período são:<br><br>' +
+      top3.map((e,i) => `${i+1}. <strong>${e[0]}</strong> — ${fmtK(e[1])} (${totalFat>0?(e[1]/totalFat*100).toFixed(1):0}% do fat.)`).join('<br>') +
+      `<br><br>Total de custos: <strong>${fmtK(totalCus)}</strong>.`;
+  }
+
+  // Breakeven
+  if (m.includes('breakeven') || m.includes('equilíbrio') || m.includes('break')) {
+    const diff = totalCus - totalFat;
+    if (totalCus === 0) return 'Sem dados de custos para calcular o ponto de equilíbrio.';
+    return `Com custos totais de ${fmtK(totalCus)}, o <strong>ponto de equilíbrio</strong> é em aproximadamente <strong>${fmtK(totalCus)} de faturamento</strong>.<br><br>Faturamento atual: ${fmtK(totalFat)} — ${diff > 0 ? `<strong>${fmtK(Math.abs(diff))} abaixo</strong> do break-even.` : `<strong>${fmtK(Math.abs(diff))} acima</strong> do break-even.`}`;
+  }
+
+  // Fluxo de caixa
+  if (m.includes('fluxo') || m.includes('caixa')) {
+    if (!rawTxn.length) return `Saldo consolidado atual: ${fmtK(saldo)} em ${rawSal.length} conta(s). Adicione transações para análise de fluxo.`;
+    const saldoPeriodo = entradas - saidas;
+    return `Fluxo do período:<br>• Entradas: ${fmtK(entradas)}<br>• Saídas: ${fmtK(saidas)}<br>• <strong>Saldo do período: ${saldoPeriodo >= 0 ? '+' : ''}${fmtK(saldoPeriodo)}</strong><br><br>Saldo consolidado: ${fmtK(saldo)} em ${rawSal.length} conta(s).`;
+  }
+
+  // Ações recomendadas
+  if (m.includes('ação') || m.includes('ações') || m.includes('recomend')) {
+    const acoes = [];
+    if (margem < 0) acoes.push('<strong>Urgente:</strong> Margem negativa — reduzir custos imediatamente.');
+    else if (margem < 10) acoes.push('<strong>Atenção:</strong> Margem abaixo de 10% — revisar estrutura de custos.');
+    if (entradas > 0 && saidas > entradas) acoes.push('<strong>Atenção:</strong> Saídas superam entradas — monitorar fluxo de caixa.');
+    if (totalCus > 0 && totalFat > 0 && (totalCus/totalFat) > 0.7) acoes.push(`<strong>Ação:</strong> Custos em ${(totalCus/totalFat*100).toFixed(0)}% do faturamento — meta recomendada: abaixo de 70%.`);
+    if (!acoes.length) acoes.push('Indicadores dentro dos parâmetros normais. Continue monitorando os dados mensalmente.');
+    return 'Com base nos seus dados, as <strong>ações prioritárias</strong> são:<br><br>' + acoes.map((a,i) => `${i+1}. ${a}`).join('<br>');
+  }
+
+  return `Seus dados do período: Faturamento <strong>${fmtK(totalFat)}</strong> · Margem <strong>${margem.toFixed(1)}%</strong> · Lucro <strong>${fmtK(lucro)}</strong>. Pergunte sobre margens, custos, fluxo de caixa, ponto de equilíbrio ou ações recomendadas.`;
 }
 
 function appendMsg(text, isUser) {
@@ -1843,7 +1898,8 @@ function exportCSV(type) {
     TRANSACOES.forEach(t => { csv += `${t.data},"${t.desc}","${t.cat}",${t.tipo},"${t.banco}",${t.valor}\n`; });
   } else if (type === 'custos') {
     filename = 'cfo_agent_custos.csv';
-    csv = 'Categoria,Jan/26,Fev/26,Variacao,Variacao%\n';
+    const m0 = MONTHS[0]||'Anterior', m1 = MONTHS[1]||'Atual';
+    csv = `Categoria,${m0},${m1},Variacao,Variacao%\n`;
     CUSTOS_CATS.forEach(c => { const d=c.fev-c.jan; csv += `"${c.cat}",${c.jan},${c.fev},${d},${c.jan>0?(d/c.jan*100).toFixed(1):0}%\n`; });
   } else {
     filename = 'cfo_agent_faturamento.csv';
@@ -2013,6 +2069,20 @@ function renderAlertas() {
     renderGroup(criticos, 'Alertas Críticos') +
     renderGroup(avisos, 'Avisos') +
     renderGroup(infos, 'Informativos');
+
+  // Update sidebar badge
+  const sidebarBadge = document.getElementById('badge-alertas');
+  if (sidebarBadge) {
+    const urgentes = criticos.length + avisos.length;
+    if (urgentes > 0) {
+      sidebarBadge.textContent = urgentes;
+      sidebarBadge.style.display = 'inline-flex';
+      sidebarBadge.style.background = criticos.length > 0 ? 'rgba(255,95,87,0.2)' : 'rgba(240,192,64,0.2)';
+      sidebarBadge.style.color = criticos.length > 0 ? '#FF5F57' : 'var(--amber)';
+    } else {
+      sidebarBadge.style.display = 'none';
+    }
+  }
 }
 
 function renderTendencias() {
@@ -2134,6 +2204,19 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTendencias();
 });
 
+async function fazerLogout() {
+  try {
+    if (window.Clerk && window.Clerk.session) {
+      await window.Clerk.signOut();
+    }
+  } catch(e) {
+    console.warn('signOut error:', e);
+  } finally {
+    window.location.replace('https://cfo-agent-five.vercel.app/');
+  }
+}
+window.fazerLogout = fazerLogout;
+
 (function() {
   var CLERK_KEY = 'pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk';
   var s = document.createElement('script');
@@ -2156,10 +2239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('user-name').textContent = name;
     document.getElementById('user-email').textContent = email;
 
-    document.getElementById('btn-logout').addEventListener('click', async function() {
-      await window.Clerk.signOut();
-      window.location.href = 'https://cfo-agent-five.vercel.app/';
-    });
+    document.getElementById('btn-logout').addEventListener('click', fazerLogout);
 
     // Run onboarding wizard for new users
     verificarOnboarding();
@@ -2650,8 +2730,8 @@ window.removerCategoriaConfig = function(tipo, cat, containerId) {
 // ONBOARDING WIZARD
 // ════════════════════════════════════════════════════════════════
 function verificarOnboarding() {
-  if (localStorage.getItem('cfo_onboarding_done')) return;
-  mostrarWizard();
+  if (localStorage.getItem('cfo_onboarding_v2')) return;
+  setTimeout(mostrarWizard, 600);
 }
 
 function mostrarWizard() {
@@ -2724,7 +2804,7 @@ window.wizardAvancar = function() {
   if (passo < 3) {
     renderizarPassoWizard(passo + 1);
   } else {
-    localStorage.setItem('cfo_onboarding_done', '1');
+    localStorage.setItem('cfo_onboarding_v2', '1');
     const overlay = document.getElementById('wizard-overlay');
     if (overlay) overlay.remove();
     showView('entrada-dados');
