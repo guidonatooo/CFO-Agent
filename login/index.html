@@ -81,14 +81,14 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   window.Clerk.load({
-    afterSignInUrl: '/dashboard',
+    fallbackRedirectUrl: '/dashboard',
     afterSignUpUrl: '/dashboard',
     afterSignOutUrl: 'https://cfo-agent-five.vercel.app/',
     signInUrl: '/login'
   }).then(function() {
     if (window.Clerk.user) { window.location.replace('/dashboard'); return; }
     window.Clerk.mountSignIn(document.getElementById('clerk-form'), {
-      afterSignInUrl: '/dashboard',
+      fallbackRedirectUrl: '/dashboard',
       appearance: {
         variables: {
           colorPrimary: '#1A4BBF',
