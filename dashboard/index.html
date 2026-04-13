@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>CFO Agent — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -545,7 +548,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--dark); 
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Exportar
       </button>
-      <a href="../login/index.html" class="topbar-btn">
+      <a href="https://cfo-agent-five.vercel.app/" class="topbar-btn" onclick="fazerLogout(event)">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sair
       </a>
@@ -2204,16 +2207,26 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTendencias();
 });
 
-async function fazerLogout() {
-  try {
-    if (window.Clerk && window.Clerk.signOut) {
-      await window.Clerk.signOut({ redirectUrl: '/' });
-    }
-  } catch(e) {
-    console.warn('signOut error:', e);
-  } finally {
-    window.location.replace('/');
-  }
+// ============================================================
+// LOGOUT — função única e definitiva
+// ============================================================
+function fazerLogout(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+
+  // 1. Limpar qualquer dado de sessão local
+  sessionStorage.clear();
+
+  // 2. Navegar imediatamente — ANTES do Clerk processar qualquer coisa
+  window.location.href = 'https://cfo-agent-five.vercel.app/';
+
+  // 3. Tentar o signOut em background (resultado não importa pois já saímos)
+  setTimeout(function() {
+    try {
+      if (window.Clerk && typeof window.Clerk.signOut === 'function') {
+        window.Clerk.signOut();
+      }
+    } catch(err) { /* ignorar */ }
+  }, 100);
 }
 window.fazerLogout = fazerLogout;
 
@@ -2224,7 +2237,13 @@ window.fazerLogout = fazerLogout;
   s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js';
   s.crossOrigin = 'anonymous';
   s.addEventListener('load', async function() {
-    await window.Clerk.load({ afterSignOutUrl: '/' });
+    await window.Clerk.load({
+      afterSignInUrl: '/dashboard',
+      afterSignUpUrl: '/dashboard',
+      afterSignOutUrl: 'https://cfo-agent-five.vercel.app/',
+      signInUrl: '/login',
+      signUpUrl: '/login'
+    });
 
     if (!window.Clerk.user) {
       window.location.href = '/login';
