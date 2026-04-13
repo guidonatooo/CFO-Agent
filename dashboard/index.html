@@ -2207,26 +2207,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTendencias();
 });
 
-// ============================================================
-// LOGOUT — função única e definitiva
-// ============================================================
-function fazerLogout(e) {
+async function fazerLogout(e) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
 
-  // 1. Limpar qualquer dado de sessão local
-  sessionStorage.clear();
+  // Mostrar feedback visual imediato
+  var btns = document.querySelectorAll('[onclick*="fazerLogout"], #btn-logout');
+  btns.forEach(function(b) { b.style.opacity = '0.5'; b.style.pointerEvents = 'none'; });
 
-  // 2. Navegar imediatamente — ANTES do Clerk processar qualquer coisa
-  window.location.href = 'https://cfo-agent-five.vercel.app/';
+  try {
+    if (window.Clerk && typeof window.Clerk.signOut === 'function') {
+      // Aguardar o signOut completar ANTES de redirecionar
+      // Isso garante que o token Google é invalidado no servidor
+      await window.Clerk.signOut({
+        redirectUrl: 'https://cfo-agent-five.vercel.app/'
+      });
+    }
+  } catch(err) {
+    console.warn('signOut error:', err);
+  }
 
-  // 3. Tentar o signOut em background (resultado não importa pois já saímos)
-  setTimeout(function() {
-    try {
-      if (window.Clerk && typeof window.Clerk.signOut === 'function') {
-        window.Clerk.signOut();
-      }
-    } catch(err) { /* ignorar */ }
-  }, 100);
+  // Redirect com replace() impede o botão "voltar" do browser
+  // Vai para a landing, não para /login — evita o loop do Google OAuth
+  window.location.replace('https://cfo-agent-five.vercel.app/');
 }
 window.fazerLogout = fazerLogout;
 

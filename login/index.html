@@ -475,30 +475,40 @@
     s.addEventListener('load', async function() {
       await window.Clerk.load();
 
-      if (window.Clerk.user) {
+      // Só redirecionar automaticamente se o usuário está logado
+      // E NÃO veio de um logout (verificar parâmetro ou referrer)
+      var veiuDoLogout = document.referrer.includes('cfo-agent-five.vercel.app')
+        && !document.referrer.includes('/login')
+        && !document.referrer.includes('/dashboard');
+
+      if (window.Clerk.user && !veiuDoLogout) {
         window.location.href = '/dashboard';
         return;
       }
 
-      window.Clerk.mountSignIn(document.getElementById('clerk-sign-in'), {
-        afterSignInUrl: '/dashboard',
-        appearance: {
-          variables: {
-            colorPrimary: '#1A4BBF',
-            colorBackground: '#ffffff',
-            colorText: '#08163A',
-            borderRadius: '10px',
-            fontFamily: 'Plus Jakarta Sans, sans-serif'
-          },
-          elements: {
-            card: 'box-shadow: none; padding: 0;',
-            headerTitle: 'display: none;',
-            headerSubtitle: 'display: none;',
-            socialButtonsBlockButton: 'border: 1px solid #C4CEDE;',
-            formButtonPrimary: 'background: #1A4BBF;'
+      // Montar o componente de login
+      var el = document.getElementById('clerk-sign-in');
+      if (el && window.Clerk.mountSignIn) {
+        window.Clerk.mountSignIn(el, {
+          afterSignInUrl: '/dashboard',
+          appearance: {
+            variables: {
+              colorPrimary: '#1A4BBF',
+              colorBackground: '#ffffff',
+              colorText: '#08163A',
+              borderRadius: '10px',
+              fontFamily: 'Plus Jakarta Sans, sans-serif'
+            },
+            elements: {
+              card: 'box-shadow: none; padding: 0;',
+              headerTitle: 'display: none;',
+              headerSubtitle: 'display: none;',
+              socialButtonsBlockButton: 'border: 1px solid #C4CEDE;',
+              formButtonPrimary: 'background: #1A4BBF;'
+            }
           }
-        }
-      });
+        });
+      }
     });
     s.addEventListener('error', function() {
       document.getElementById('clerk-sign-in').innerHTML =
