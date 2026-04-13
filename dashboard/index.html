@@ -2204,15 +2204,16 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTendencias();
 });
 
-async function fazerLogout() {
+function fazerLogout() {
+  // Redirect first — prevents Clerk from overriding the destination
+  window.location.replace('https://cfo-agent-five.vercel.app/');
+  // Fire signOut async after redirect is already in progress
   try {
-    if (window.Clerk && window.Clerk.session) {
-      await window.Clerk.signOut();
+    if (window.Clerk && window.Clerk.signOut) {
+      window.Clerk.signOut();
     }
   } catch(e) {
-    console.warn('signOut error:', e);
-  } finally {
-    window.location.replace('https://cfo-agent-five.vercel.app/');
+    // Ignore — redirect already happened
   }
 }
 window.fazerLogout = fazerLogout;
@@ -2739,13 +2740,13 @@ function mostrarWizard() {
   overlay.id = 'wizard-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(4,11,30,0.97);display:flex;align-items:center;justify-content:center;';
   overlay.innerHTML = `
-    <div style="background:#0E1E3D;border:1px solid rgba(26,75,191,0.4);border-radius:20px;padding:48px;width:520px;max-width:90vw;position:relative;">
+    <div style="background:#0E1E3D;border:1px solid rgba(26,75,191,0.4);border-radius:20px;padding:48px;width:520px;max-width:90vw;position:relative;color:white;font-family:inherit;">
       <div style="display:flex;gap:8px;margin-bottom:32px;justify-content:center;">
         <div id="step-dot-1" style="width:8px;height:8px;border-radius:50%;background:#1A4BBF;transition:background .2s;"></div>
         <div id="step-dot-2" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:background .2s;"></div>
         <div id="step-dot-3" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:background .2s;"></div>
       </div>
-      <div id="wizard-content"></div>
+      <div id="wizard-content" style="color:white;min-height:120px;"></div>
       <div style="display:flex;justify-content:space-between;margin-top:32px;">
         <button id="wizard-back" onclick="wizardVoltar()" style="padding:10px 24px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.5);cursor:pointer;font-size:14px;display:none;font-family:var(--font-b)">← Voltar</button>
         <button id="wizard-next" onclick="wizardAvancar()" style="padding:10px 28px;background:linear-gradient(135deg,#1A4BBF,#2D63E0);border:none;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:600;margin-left:auto;font-family:var(--font-b)">Próximo →</button>
@@ -2756,43 +2757,79 @@ function mostrarWizard() {
   renderizarPassoWizard(1);
 }
 
-const WIZARD_PASSOS = {
-  1: { conteudo: `
-    <h2 style="font-size:24px;font-weight:700;color:white;margin-bottom:8px;font-family:'Cormorant Garamond',serif">👋 Bem-vindo ao CFO Agent</h2>
-    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:24px;">Vamos configurar seu painel em 3 passos rápidos.</p>
-    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:12px;">Qual o nome da sua empresa?</p>
-    <input id="wizard-empresa" type="text" placeholder="Ex: Minha Empresa Ltda."
-      style="width:100%;padding:14px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(26,75,191,0.4);border-radius:10px;color:white;font-size:16px;box-sizing:border-box;outline:none;font-family:var(--font-b)"
-    />` },
-  2: { conteudo: `
-    <h2 style="font-size:24px;font-weight:700;color:white;margin-bottom:8px;font-family:'Cormorant Garamond',serif">🏦 Seus bancos</h2>
-    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:20px;">Selecione os principais. Pode adicionar mais depois.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-      ${['Nubank','Itaú','Bradesco','Santander','Banco do Brasil','Caixa','Inter','C6 Bank','BTG','Stone','Asaas','Outro'].map(b=>`
-        <label style="cursor:pointer;">
-          <input type="checkbox" value="${b}" style="display:none;" onchange="window._toggleBancoWizard(this)">
-          <span style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:100px;font-size:13px;color:rgba(255,255,255,0.7);transition:all .15s;user-select:none;">${b}</span>
-        </label>`).join('')}
-    </div>` },
-  3: { conteudo: `
-    <div style="text-align:center;padding:16px 0;">
-      <div style="font-size:64px;margin-bottom:16px;">🎉</div>
-      <h2 style="font-size:24px;font-weight:700;color:white;margin-bottom:12px;font-family:'Cormorant Garamond',serif">Tudo pronto!</h2>
-      <p style="color:rgba(255,255,255,0.55);font-size:15px;line-height:1.6;">Agora acesse <strong style="color:white;">Entrada de Dados</strong> para inserir seu faturamento, custos e transações.<br><br>Os gráficos serão gerados automaticamente.</p>
-    </div>` }
-};
-
 function renderizarPassoWizard(passo) {
   window._wizardPasso = passo;
-  document.getElementById('wizard-content').innerHTML = WIZARD_PASSOS[passo].conteudo;
-  [1,2,3].forEach(i => {
-    const dot = document.getElementById('step-dot-'+i);
-    if (dot) dot.style.background = i===passo ? '#1A4BBF' : 'rgba(255,255,255,0.2)';
+
+  var conteudo = {
+    1: '<div style="text-align:center;margin-bottom:28px;">'
+      +'<div style="font-size:48px;margin-bottom:16px;">👋</div>'
+      +'<h2 style="font-size:24px;font-weight:700;color:#ffffff;margin:0 0 12px 0;font-family:inherit;">'
+      +'Bem-vindo ao CFO Agent</h2>'
+      +'<p style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.6;margin:0;">'
+      +'Vamos configurar seu painel em 3 passos rápidos.<br>Começa com o nome da sua empresa.</p>'
+      +'</div>'
+      +'<input id="wizard-empresa" type="text" placeholder="Ex: Minha Empresa Ltda."'
+      +' value="'+(localStorage.getItem('cfo_empresa')||'')+'"'
+      +' style="width:100%;padding:14px 18px;background:rgba(255,255,255,0.08);'
+      +'border:1px solid rgba(26,75,191,0.5);border-radius:10px;'
+      +'color:#ffffff;font-size:16px;box-sizing:border-box;outline:none;'
+      +'font-family:inherit;caret-color:white;" />',
+
+    2: '<h2 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 8px 0;font-family:inherit;">'
+      +'🏦 Quais bancos sua empresa usa?</h2>'
+      +'<p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 20px 0;">'
+      +'Selecione os principais. Pode adicionar mais depois em Entrada de Dados.</p>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+      +['Nubank','Itaú','Bradesco','Santander','Banco do Brasil',
+        'Caixa','Inter','C6 Bank','BTG Pactual','Stone','Asaas',
+        'Sicoob','Sicredi','XP','Outro'].map(function(b) {
+          return '<label style="cursor:pointer;">'
+            +'<input type="checkbox" value="'+b+'" style="display:none;"'
+            +' onchange="window._toggleBancoWizard(this)">'
+            +'<span style="display:inline-block;padding:8px 16px;'
+            +'background:rgba(255,255,255,0.06);'
+            +'border:1px solid rgba(255,255,255,0.15);'
+            +'border-radius:100px;font-size:13px;'
+            +'color:rgba(255,255,255,0.7);'
+            +'transition:all 0.15s;user-select:none;">'+b+'</span>'
+            +'</label>';
+        }).join('')
+      +'</div>',
+
+    3: '<div style="text-align:center;padding:16px 0;">'
+      +'<div style="font-size:60px;margin-bottom:20px;">🎉</div>'
+      +'<h2 style="font-size:24px;font-weight:700;color:#ffffff;margin:0 0 14px 0;font-family:inherit;">'
+      +'Tudo pronto!</h2>'
+      +'<p style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.7;margin:0;">'
+      +'Acesse <strong style="color:#F0C040;font-weight:700;">Entrada de Dados</strong>'
+      +' na barra lateral para inserir<br>'
+      +'faturamento, custos e transações.<br><br>'
+      +'<span style="color:rgba(255,255,255,0.45);font-size:13px;">'
+      +'Os gráficos e alertas serão gerados automaticamente.</span>'
+      +'</p></div>'
+  };
+
+  var body = document.getElementById('wizard-content');
+  if (!body) return;
+  body.innerHTML = conteudo[passo] || '';
+
+  [1,2,3].forEach(function(i) {
+    var dot = document.getElementById('step-dot-'+i);
+    if (dot) dot.style.background = i <= passo ? '#1A4BBF' : 'rgba(255,255,255,0.2)';
   });
-  const back = document.getElementById('wizard-back');
+
+  var back = document.getElementById('wizard-back');
   if (back) back.style.display = passo > 1 ? 'block' : 'none';
-  const next = document.getElementById('wizard-next');
+
+  var next = document.getElementById('wizard-next');
   if (next) next.textContent = passo === 3 ? '✓ Começar' : 'Próximo →';
+
+  if (passo === 1) {
+    setTimeout(function() {
+      var el = document.getElementById('wizard-empresa');
+      if (el) el.focus();
+    }, 150);
+  }
 }
 
 window.wizardAvancar = function() {
