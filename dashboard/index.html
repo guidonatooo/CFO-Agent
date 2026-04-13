@@ -2210,18 +2210,17 @@ window.fazerLogout = fazerLogout;
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  if (!window.Clerk) { window.location.replace('/login'); return; }
+  if (!window.Clerk) { return; }
   window.Clerk.load({
-    afterSignInUrl: '/dashboard',
     afterSignOutUrl: 'https://cfo-agent-five.vercel.app/'
   }).then(function() {
     if (!window.Clerk.user) { window.location.replace('/login'); return; }
     var emailEl = document.getElementById('user-email');
     if (emailEl) emailEl.textContent =
       window.Clerk.user.primaryEmailAddress?.emailAddress || '';
-    verificarOnboarding();
-    inicializarDashboard();
-  });
+    try { verificarOnboarding(); } catch(e) {}
+    try { inicializarDashboard(); } catch(e) { console.warn(e); }
+  }).catch(function(e) { console.warn('Clerk error:', e); });
 });
 
 // ═══════════════════════════════════════════════════════════════════
