@@ -2204,16 +2204,15 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTendencias();
 });
 
-function fazerLogout() {
-  // Redirect first — prevents Clerk from overriding the destination
-  window.location.replace('https://cfo-agent-five.vercel.app/');
-  // Fire signOut async after redirect is already in progress
+async function fazerLogout() {
   try {
     if (window.Clerk && window.Clerk.signOut) {
-      window.Clerk.signOut();
+      await window.Clerk.signOut({ redirectUrl: '/' });
     }
   } catch(e) {
-    // Ignore — redirect already happened
+    console.warn('signOut error:', e);
+  } finally {
+    window.location.replace('/');
   }
 }
 window.fazerLogout = fazerLogout;
@@ -2225,7 +2224,7 @@ window.fazerLogout = fazerLogout;
   s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js';
   s.crossOrigin = 'anonymous';
   s.addEventListener('load', async function() {
-    await window.Clerk.load();
+    await window.Clerk.load({ afterSignOutUrl: '/' });
 
     if (!window.Clerk.user) {
       window.location.href = '/login';
