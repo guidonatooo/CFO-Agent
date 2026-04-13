@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CFO Agent — Documentação e Guia de Início</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:#F6F8FD;color:#3C4E6E;line-height:1.7;}
+  nav{background:#08163A;padding:0 5%;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:white;text-decoration:none;letter-spacing:0.06em;}
+  .nav-btn{padding:8px 20px;background:linear-gradient(135deg,#C9971C,#F0C040);border-radius:8px;color:#08163A;text-decoration:none;font-size:13px;font-weight:700;}
+  .hero{background:linear-gradient(135deg,#08163A,#0E2F7A);padding:80px 5%;text-align:center;color:white;}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:700;margin-bottom:16px;line-height:1.1;}
+  .hero p{font-size:18px;color:rgba(255,255,255,0.65);max-width:560px;margin:0 auto;}
+  .container{max-width:860px;margin:0 auto;padding:64px 5%;}
+  .toc{background:white;border:1px solid #EEF1F8;border-radius:16px;padding:32px;margin-bottom:48px;}
+  .toc h2{font-size:16px;font-weight:700;color:#08163A;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;}
+  .toc ol{padding-left:20px;}
+  .toc li{margin-bottom:10px;}
+  .toc a{color:#1A4BBF;text-decoration:none;font-size:15px;font-weight:500;}
+  .toc a:hover{text-decoration:underline;}
+  .section{background:white;border:1px solid #EEF1F8;border-radius:16px;padding:40px;margin-bottom:24px;}
+  .section-num{font-size:13px;font-weight:700;color:#1A4BBF;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+  .section h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#08163A;margin-bottom:16px;}
+  .section p{font-size:15px;color:#3C4E6E;margin-bottom:16px;line-height:1.8;}
+  .section ul,.section ol{padding-left:20px;margin-bottom:16px;}
+  .section li{font-size:15px;color:#3C4E6E;margin-bottom:8px;line-height:1.7;}
+  .highlight{background:#EBF0FC;border-left:4px solid #1A4BBF;border-radius:0 10px 10px 0;padding:16px 20px;margin:20px 0;font-size:14px;color:#08163A;}
+  .highlight strong{color:#1A4BBF;}
+  .warning{background:#FFF8E7;border-left:4px solid #C9971C;border-radius:0 10px 10px 0;padding:16px 20px;margin:20px 0;font-size:14px;color:#08163A;}
+  .step-card{display:flex;gap:20px;align-items:flex-start;padding:20px;background:#F6F8FD;border-radius:12px;margin-bottom:12px;}
+  .step-num{width:36px;height:36px;background:#1A4BBF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;flex-shrink:0;}
+  .step-content h3{font-size:15px;font-weight:700;color:#08163A;margin-bottom:4px;}
+  .step-content p{font-size:14px;color:#8494B2;margin:0;}
+  .cta-box{background:linear-gradient(135deg,#08163A,#0E2F7A);border-radius:16px;padding:40px;text-align:center;margin-top:48px;}
+  .cta-box h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:white;margin-bottom:12px;}
+  .cta-box p{color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:24px;}
+  .cta-box a{display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#C9971C,#F0C040);border-radius:10px;color:#08163A;text-decoration:none;font-size:15px;font-weight:700;}
+  kbd{background:#EEF1F8;border:1px solid #C4CEDE;border-radius:4px;padding:2px 8px;font-size:13px;font-family:monospace;color:#3C4E6E;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">CFO Agent</a>
+  <a href="https://cfo-agent-five.vercel.app/login" class="nav-btn">Acessar Dashboard →</a>
+</nav>
+
+<div class="hero">
+  <h1>Guia de Início Rápido</h1>
+  <p>Tudo que você precisa para configurar e usar o CFO Agent do zero ao controle financeiro completo.</p>
+</div>
+
+<div class="container">
+
+  <div class="toc">
+    <h2>Índice</h2>
+    <ol>
+      <li><a href="#acesso">Realizando seu primeiro acesso</a></li>
+      <li><a href="#configuracao">Configurando sua empresa</a></li>
+      <li><a href="#dados">Inserindo seus dados financeiros</a></li>
+      <li><a href="#dashboard">Entendendo o Dashboard</a></li>
+      <li><a href="#alertas">Sistema de Alertas</a></li>
+      <li><a href="#relatorios">Exportando Relatórios</a></li>
+      <li><a href="#duvidas">Dúvidas Frequentes</a></li>
+    </ol>
+  </div>
+
+  <div class="section" id="acesso">
+    <div class="section-num">01</div>
+    <h2>Realizando seu primeiro acesso</h2>
+    <p>Seu acesso foi criado com o email cadastrado no momento da contratação. Siga os passos abaixo:</p>
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Acesse a página de login</h3>
+        <p>Vá para <strong>cfo-agent-five.vercel.app/login</strong> ou clique no botão no topo desta página.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Entre com suas credenciais</h3>
+        <p>Use o email e a senha definidos no email de boas-vindas que você recebeu.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Complete o assistente de configuração</h3>
+        <p>Na primeira entrada, um assistente de 3 passos vai te guiar pela configuração inicial da sua empresa.</p>
+      </div>
+    </div>
+    <div class="highlight">
+      <strong>Dica:</strong> Se esqueceu sua senha, use o link "Esqueci minha senha" na tela de login.
+    </div>
+  </div>
+
+  <div class="section" id="configuracao">
+    <div class="section-num">02</div>
+    <h2>Configurando sua empresa</h2>
+    <p>Antes de inserir dados, configure o CFO Agent para a realidade do seu negócio. Vá em <kbd>Configurações</kbd> na barra lateral.</p>
+    <ul>
+      <li><strong>Nome da empresa:</strong> aparece no header do dashboard e nos relatórios.</li>
+      <li><strong>Meta de margem de lucro:</strong> percentual mínimo aceitável para o seu negócio. O padrão é 10%, mas cada setor tem sua realidade.</li>
+      <li><strong>Meta de faturamento mensal:</strong> valor de referência para alertas e comparações.</li>
+      <li><strong>Limite de alerta de custo:</strong> quando um custo superar esse percentual em relação à meta, você recebe um alerta crítico.</li>
+      <li><strong>Categorias personalizadas:</strong> adicione ou remova categorias de receita e custo conforme o seu setor.</li>
+    </ul>
+    <div class="warning">
+      <strong>Importante:</strong> As metas configuradas aqui são usadas em todos os cálculos de alerta. Defina valores realistas para o seu negócio.
+    </div>
+  </div>
+
+  <div class="section" id="dados">
+    <div class="section-num">03</div>
+    <h2>Inserindo seus dados financeiros</h2>
+    <p>Toda a alimentação do sistema é feita na seção <kbd>Entrada de Dados</kbd>. Ela tem 4 abas:</p>
+
+    <h3 style="font-size:17px;font-weight:700;color:#08163A;margin:24px 0 12px;">🟢 Aba Faturamento</h3>
+    <p>Registre todas as receitas do mês. Para cada entrada informe: mês, descrição (ex: "Venda de serviço para Cliente X"), valor e categoria.</p>
+    <div class="highlight"><strong>Frequência recomendada:</strong> Atualizar semanalmente ou ao fechar o mês.</div>
+
+    <h3 style="font-size:17px;font-weight:700;color:#08163A;margin:24px 0 12px;">🔴 Aba Custos</h3>
+    <p>Registre todas as despesas: folha de pagamento, fornecedores, aluguel, impostos, etc. Escolha a categoria que melhor descreve o custo — isso alimenta os gráficos de breakdown.</p>
+
+    <h3 style="font-size:17px;font-weight:700;color:#08163A;margin:24px 0 12px;">🏦 Aba Saldos Bancários</h3>
+    <p>Informe o saldo inicial e final de cada conta bancária por mês. Isso alimenta o Fluxo de Caixa e o Saldo Consolidado.</p>
+
+    <h3 style="font-size:17px;font-weight:700;color:#08163A;margin:24px 0 12px;">📋 Aba Transações</h3>
+    <p>Aqui você pode inserir transações individualmente ou fazer upload de um arquivo exportado do seu banco:</p>
+    <ul>
+      <li>Arraste o arquivo Excel (.xlsx) ou CSV para a área de upload</li>
+      <li>O sistema lê as colunas automaticamente</li>
+      <li>Revise e edite qualquer linha antes de salvar</li>
+      <li>Cada transação deve ter: data, banco, descrição, tipo (débito/crédito) e valor</li>
+    </ul>
+    <div class="warning">
+      <strong>Como exportar o extrato do seu banco:</strong> Na maioria dos bancos, acesse o extrato do período desejado e procure a opção "Exportar" ou "Download" no formato Excel ou CSV.
+    </div>
+  </div>
+
+  <div class="section" id="dashboard">
+    <div class="section-num">04</div>
+    <h2>Entendendo o Dashboard</h2>
+    <p>O dashboard tem 10 seções acessíveis pela barra lateral. Aqui está o que cada uma mostra:</p>
+    <ul>
+      <li><strong>Visão Geral:</strong> KPIs principais (faturamento, lucro, margem, saldo) + gráfico de evolução + alertas ativos.</li>
+      <li><strong>Evolução Temporal:</strong> comparação mês a mês de faturamento, custos e lucro.</li>
+      <li><strong>Breakdown de Custos:</strong> distribuição das despesas por categoria com gráfico de pizza e barras.</li>
+      <li><strong>Fluxo de Caixa:</strong> entradas vs saídas por banco e evolução do saldo.</li>
+      <li><strong>Tabela de Custos:</strong> visão detalhada de cada categoria com variação percentual.</li>
+      <li><strong>Transações:</strong> todas as movimentações com filtros por banco, mês e tipo.</li>
+      <li><strong>Tendências:</strong> projeções baseadas no histórico dos últimos meses.</li>
+      <li><strong>Alertas:</strong> notificações automáticas sobre desvios financeiros.</li>
+      <li><strong>Assistente IA:</strong> faça perguntas em linguagem natural sobre seus dados.</li>
+      <li><strong>Relatórios:</strong> exporte resumos em PDF ou CSV para reuniões e prestação de contas.</li>
+    </ul>
+    <div class="highlight">
+      <strong>Filtro de período:</strong> Use o seletor de mês no canto superior direito para filtrar todos os painéis pelo período desejado.
+    </div>
+  </div>
+
+  <div class="section" id="alertas">
+    <div class="section-num">05</div>
+    <h2>Sistema de Alertas</h2>
+    <p>Os alertas são gerados automaticamente com base nos dados inseridos e nas metas configuradas. Existem 3 níveis:</p>
+    <ul>
+      <li><strong style="color:#D63047;">🔴 Crítico:</strong> requer atenção imediata. Ex: margem negativa, custos maiores que receita.</li>
+      <li><strong style="color:#C9971C;">⚠️ Aviso:</strong> ponto de atenção. Ex: custo acima da meta, queda no faturamento.</li>
+      <li><strong style="color:#1A4BBF;">ℹ️ Informativo:</strong> dados relevantes sem urgência. Ex: variação leve de período.</li>
+    </ul>
+    <p>O número vermelho ao lado de "Alertas" na sidebar indica quantos alertas críticos e avisos estão ativos no período selecionado.</p>
+  </div>
+
+  <div class="section" id="relatorios">
+    <div class="section-num">06</div>
+    <h2>Exportando Relatórios</h2>
+    <p>Na seção <kbd>Relatórios</kbd> você encontra dois tipos de exportação:</p>
+    <ul>
+      <li><strong>Exportar CSV:</strong> gera um arquivo de planilha com todos os dados do período. Ideal para análise em Excel ou Google Sheets.</li>
+      <li><strong>Imprimir / PDF:</strong> abre a janela de impressão do browser com o relatório formatado. Selecione "Salvar como PDF" no destino de impressão.</li>
+    </ul>
+    <div class="highlight">
+      <strong>Dica:</strong> Use o relatório mensal em PDF para apresentações de resultado para sócios, investidores ou reuniões de diretoria.
+    </div>
+  </div>
+
+  <div class="section" id="duvidas">
+    <div class="section-num">07</div>
+    <h2>Dúvidas Frequentes</h2>
+
+    <p><strong>Os dados ficam salvos se eu fechar o navegador?</strong><br>
+    Sim. Todos os dados são salvos automaticamente no banco de dados seguro associado ao seu login.</p>
+
+    <p style="margin-top:20px;"><strong>Posso usar em vários dispositivos?</strong><br>
+    Sim. Basta fazer login com as mesmas credenciais em qualquer dispositivo.</p>
+
+    <p style="margin-top:20px;"><strong>Como adicionar mais usuários da minha empresa?</strong><br>
+    Entre em contato via WhatsApp. Planos com até 3 usuários não têm custo adicional.</p>
+
+    <p style="margin-top:20px;"><strong>Os meus dados são seguros?</strong><br>
+    Sim. Os dados são criptografados em trânsito (HTTPS) e armazenados em banco de dados PostgreSQL com acesso isolado por usuário. Nenhum outro cliente tem acesso às suas informações.</p>
+
+    <p style="margin-top:20px;"><strong>Posso importar dados de meses anteriores?</strong><br>
+    Sim. Basta selecionar o mês correto ao inserir cada registro na Entrada de Dados.</p>
+  </div>
+
+  <div class="cta-box">
+    <h2>Precisa de ajuda?</h2>
+    <p>Nossa equipe está disponível durante os 3 meses de suporte incluídos no seu plano.</p>
+    <a href="https://wa.me/5519991848687">💬 Falar com o suporte →</a>
+  </div>
+
+</div>
+
+</body>
+</html>
