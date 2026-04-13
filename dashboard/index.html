@@ -12,6 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="/js/db.js"></script>
+<script src="https://artistic-stud-29.clerk.accounts.dev/npm/@clerk/clerk-js/dist/clerk.browser.js" data-clerk-publishable-key="pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk" defer></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -2133,14 +2134,12 @@ function renderTendencias() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+function inicializarDashboard() {
   populateMonthSelect();
 
-  // Load transactions
   const storedTxn = CFOData.getTransacoes();
   if (storedTxn && storedTxn.length) TRANSACOES = storedTxn;
 
-  // Build month/fat/custos arrays from localStorage
   const storedFat = CFOData.getFaturamento();
   if (storedFat && storedFat.length) {
     const byMes = {};
@@ -2166,7 +2165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     CUSTOS_CATS.push(...Object.values(byCatMes));
 
-    // Build CUSTOS_TOT parallel to FAT months
     MONTHS.forEach(m => {
       const tot = storedCus.filter(r=>r.mes===m).reduce((s,r)=>s+parseFloat(r.valor||0),0);
       CUSTOS_TOT.push(tot);
@@ -2175,7 +2173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     MONTHS.forEach((_,i) => MARGEM.push(FAT[i]>0?((LUCRO[i]||0)/FAT[i]*100):0));
   }
 
-  // Build BANCOS from saldos
   const storedSal = CFOData.getSaldos();
   if (storedSal && storedSal.length) {
     const bancosMap = {};
@@ -2193,9 +2190,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Run onboarding check (will be defined later, safe to call)
-  if (typeof verificarOnboarding === 'function') verificarOnboarding();
-
   initCharts();
   buildCustosTable();
   buildCustosDetalhadoTable();
@@ -2205,70 +2199,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderKPIs();
   renderAlertas();
   renderTendencias();
-});
+}
 
-async function fazerLogout(e) {
-  if (e) { e.preventDefault(); e.stopPropagation(); }
-
-  // Mostrar feedback visual imediato
-  var btns = document.querySelectorAll('[onclick*="fazerLogout"], #btn-logout');
-  btns.forEach(function(b) { b.style.opacity = '0.5'; b.style.pointerEvents = 'none'; });
-
-  try {
-    if (window.Clerk && typeof window.Clerk.signOut === 'function') {
-      // Aguardar o signOut completar ANTES de redirecionar
-      // Isso garante que o token Google é invalidado no servidor
-      await window.Clerk.signOut({
-        redirectUrl: 'https://cfo-agent-five.vercel.app/'
-      });
-    }
-  } catch(err) {
-    console.warn('signOut error:', err);
-  }
-
-  // Redirect com replace() impede o botão "voltar" do browser
-  // Vai para a landing, não para /login — evita o loop do Google OAuth
+async function fazerLogout() {
+  await window.Clerk.signOut();
   window.location.replace('https://cfo-agent-five.vercel.app/');
 }
 window.fazerLogout = fazerLogout;
 
-(function() {
-  var CLERK_KEY = 'pk_test_YXJ0aXN0aWMtc3R1ZC0yOS5jbGVyay5hY2NvdW50cy5kZXYk';
-  var s = document.createElement('script');
-  s.setAttribute('data-clerk-publishable-key', CLERK_KEY);
-  s.src = 'https://artistic-stud-29.clerk.accounts.dev/npm/@clerk/clerk-js/dist/clerk.browser.js';
-  s.crossOrigin = 'anonymous';
-  s.addEventListener('load', async function() {
-    await window.Clerk.load({
-      afterSignInUrl: '/dashboard',
-      afterSignUpUrl: '/dashboard',
-      afterSignOutUrl: 'https://cfo-agent-five.vercel.app/',
-      signInUrl: '/login',
-      signUpUrl: '/login'
-    });
-
-    if (!window.Clerk.user) {
-      window.location.href = '/login';
-      return;
-    }
-
-    const user = window.Clerk.user;
-    const email = user.primaryEmailAddress?.emailAddress || '';
-    const name = user.firstName || email.split('@')[0] || 'Usuário';
-    const initial = name.charAt(0).toUpperCase();
-    document.getElementById('user-avatar').textContent = initial;
-    document.getElementById('user-name').textContent = name;
-    document.getElementById('user-email').textContent = email;
-
-    document.getElementById('btn-logout').addEventListener('click', fazerLogout);
-
-    // Run onboarding wizard for new users
+document.addEventListener('DOMContentLoaded', function() {
+  if (!window.Clerk) { window.location.replace('/login'); return; }
+  window.Clerk.load({
+    afterSignInUrl: '/dashboard',
+    afterSignOutUrl: 'https://cfo-agent-five.vercel.app/'
+  }).then(function() {
+    if (!window.Clerk.user) { window.location.replace('/login'); return; }
+    var emailEl = document.getElementById('user-email');
+    if (emailEl) emailEl.textContent =
+      window.Clerk.user.primaryEmailAddress?.emailAddress || '';
     verificarOnboarding();
-
-    window.CFOGetUserId = () => window.Clerk.user?.id || null;
+    inicializarDashboard();
   });
-  document.head.appendChild(s);
-})();
+});
 
 // ═══════════════════════════════════════════════════════════════════
 // CFOData — global data layer with localStorage persistence
